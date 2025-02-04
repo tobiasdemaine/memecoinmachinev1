@@ -9,8 +9,9 @@ import {
   MARKET_STATE_LAYOUT_V3,
   SPL_MINT_LAYOUT,
   TOKEN_PROGRAM_ID,
+  InnerSimpleV0Transaction,
 } from "@raydium-io/raydium-sdk";
-import { PublicKey, VersionedTransaction } from "@solana/web3.js";
+import { PublicKey, SendOptions, VersionedTransaction } from "@solana/web3.js";
 
 import {
   myKeyPair,
@@ -46,7 +47,10 @@ async function getWalletTokenAccount(connection, myKeyPair) {
   }));
 }
 
-async function buildAndSendTx(innerSimpleV0Transaction, options) {
+async function buildAndSendTx(
+  innerSimpleV0Transaction: InnerSimpleV0Transaction[],
+  options?: SendOptions
+) {
   const willSendTx = await buildSimpleTransaction({
     connection,
     makeTxVersion,
@@ -58,7 +62,11 @@ async function buildAndSendTx(innerSimpleV0Transaction, options) {
   return await sendTx(connection, myKeyPair, willSendTx, options);
 }
 
-function getATAAddress(programId, owner, mint) {
+function getATAAddress(
+  programId: PublicKey,
+  owner: PublicKey,
+  mint: PublicKey
+) {
   const { publicKey, nonce } = findProgramAddress(
     [owner.toBuffer(), programId.toBuffer(), mint.toBuffer()],
     new PublicKey("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")
@@ -128,4 +136,5 @@ export {
   getATAAddress,
   sleepTime,
   formatAmmKeysById,
+  buildSimpleTransaction,
 };

@@ -1,4 +1,5 @@
 {
+  "SOL_AMOUNT": 1,
   "mode": "DEV",
   "url": "https://www.littlecpaitalist.com/",
   "domain": "littlecapitalist.com",
@@ -7,9 +8,7 @@
   "ipfsLogoLink": "",
   "ipfsMetaDataLink": "",
   "wallets": {
-    "NUM_RECIPIENTS": 20,
-    "SOURCE_WALLET": "",
-    "SOL_PER_RECIPIENT": ""
+    "NUM_RECIPIENTS": 20
   },
   "decimals": 8,
   "initialSupply": 1000000,
@@ -38,7 +37,7 @@
     "gradientEnd": "#D4A5F9",
     "heroImage": "./images/hero.png",
     "logo": "./images/logo.png",
-    "documentPDF": "./images/document.pdf",
+    "documentPDF": "./pdf/document.pdf",
     "entityCopyrightFooter": "Shell",
     "welcomeText": "Welcome to the Shell Token Farming Website",
     "welcomeMessage": "Welcome to the Shell Token Farming Website. Here you can stake your Shell Tokens and earn rewards. The more Shell Tokens you stake, the more rewards you will earn. You can also earn rewards by referring your friends to the Shell Token Farming Website. For every friend you refer, you will earn a bonus reward. Start staking your Shell Tokens today and earn rewards!",

@@ -20,6 +20,7 @@ def main():
         config = json.load(f)
 
     kname = config["mode"] + "_" + config['metaData']['symbol']
+    sol_amount = config["sol_amount"]
     # Generate a keypair for the token mint
     print("Generating token mint keypair...")
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-keypair.json --force --starts-with bos:1")
@@ -32,6 +33,7 @@ def main():
         run_command(f"solana airdrop 2 {mint_authority}")
     if config["mode"] == "PROD":
         run_command(f"solana config set --url mainnet")
+        run_command(f"solana transfer --keypair ./my_wallet.json --to {mint_authority} {sol_amount}")
 
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --starts-with mnt:1")
    

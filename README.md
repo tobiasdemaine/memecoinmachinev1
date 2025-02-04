@@ -1,4 +1,35 @@
-#1 create token base
+## Install
+
+'''
+./install.sh
+'''
+
+## Create Base Account
+
+This account is where all profit sol is paid into
+'''
+python3 python/createBaseAccount.py
+
+# STAGED
+
+staged is grouped steps
+
+mode: DEV|PROD
+symbol: SYMBOL
+
+scripts/1_start.sh <mode> <symbol>
+
+scripts/2_publish.sh <mode> <symbol>
+
+scripts/3_create.sh <mode> <symbol>
+
+scripts/4_watch.sh <mode> <symbol>
+
+# MANUAL
+
+manual is every step of the process
+
+## 1 create token base
 
 mode: DEV|PROD
 symbol: SYMBOL
@@ -9,40 +40,46 @@ python3 python/tokenStart.py <mode> <symbol>
 
 new json file will be generated in ./tokens/<mode>\_<symbol>.json edit it and add media files.
 
-#2 Generate website
+## 2 Generate website
 
 '''
 python3 python/generateSite.py tokens/<mode>\_<symbol>.json
 '''
 
-#3 Publish website
+## 3 Publish website
+
 domain your update name servers
 
 '''
 python3 publishWebsite.py <mode>\_<symbol>.json
 '''
 
-#4 Create Token
+## 4 Create Token
+
 '''
 python3 createToken.py <mode>\_<symbol>.json
 '''
 
-#5 Distribute Sol to buy in accounts
+## 5 Distribute Sol to buy in accounts
+
 '''
 python3 distributeSol.py <mode>\_<symbol>.json
 '''
 
-#6 Publish the token to Raydium
+## 6 Publish the token to Raydium
+
 '''
 python3 publishToken.py <mode>\_<symbol>.json
 '''
 
-#7 TOKEN BUY IN
+## 7 TOKEN BUY IN
+
 '''
 python3 tokenBuyin.py <mode>\_<symbol>.json
 '''
 
-#8 TOKEN EXIT
+## 8 TOKEN WATCH
+
 '''
-python3 tokenExit.py <mode>\_<symbol>.json
+python3 tokenWatch.py <mode>\_<symbol>.json
 '''

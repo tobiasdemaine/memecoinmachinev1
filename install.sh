@@ -40,15 +40,23 @@ install_if_missing node "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo
 install_if_missing yarn "npm install -g yarn"
 
 # Install Metaplex CLI
-install_if_missing metaplex "npm install -g @metaplex/cli"
+#install_if_missing metaplex "npm install -g @metaplex/cli"
 
 # Verify Metaplex CLI installation
-metaplex --version
+#metaplex --version
 
-install_if_missing raydium "npm install -g @raydium-io/cli"
+#install_if_missing raydium "npm install -g @raydium-io/cli"
 
 # Verify Raydium CLI installation
-raydium --version
+#raydium --version
 
 echo "Installation complete! Please restart your terminal or run:"
 echo "export PATH=\"\$HOME/.local/share/solana/install/active_release/bin:\$PATH\""
+
+# Create directory "./tokens" if it does not exist
+if [ ! -d "./tokens" ]; then
+    mkdir ./tokens
+    echo "Directory ./tokens created."
+else
+    echo "Directory ./tokens already exists."
+fi

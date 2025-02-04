@@ -26,7 +26,7 @@ const main = async () => {
 
   const quoteToken = DEFAULT_TOKEN.WSOL;
   const outputToken = baseToken;
-  const inputTokenAmount = new TokenAmount(quoteToken, process.argv[3]);
+  const inputTokenAmount = new TokenAmount(quoteToken, config.tokenData.amount);
   const walletSecret = process.argv[3];
   const slippage = new Percent(1, 100);
   const wallet = Keypair.fromSecretKey(

@@ -7,11 +7,6 @@ from solana.publickey import PublicKey
 from solana.transaction import Transaction
 from solana.system_program import TransferParams, transfer
 
-# Ensure Raydium CLI is installed
-if not os.system("command -v raydium > /dev/null") == 0:
-    print("Raydium CLI not installed. Please install it first.")
-    sys.exit(1)
-
 # Check for required arguments
 if len(sys.argv) < 2:
     print("Usage: python token_buy_in.py <jsonfile> ")
@@ -30,14 +25,17 @@ if not os.path.isfile(WALLETS_FILE):
     print(f"Wallet file {WALLETS_FILE} not found. Run the generate script first.")
     sys.exit(1)
 
-client = Client("https://api.devnet.solana.com")
+network = "mainnet"
+if(config["mode"] == "DEV"):
+    network = "devnet"
 
+SWAP_AMOUNT = float(config["wallets"]["BASE_AMOUNT"]) / int(config["wallets"]["NUM_RECIPIENTS"]) # The amount of SOL to swap for the token
+#cli =True
 # Loop through wallets and swap all SOL for the specified token
 with open(WALLETS_FILE, 'r') as file:
     for line in file:
         wallet_address, wallet_file = line.strip().split("->")
         print(f"Using wallet: {wallet_address} ({wallet_file})")
-
         # Load the wallet keypair
         with open("../tokens/wallets/"+wallet_file, 'r') as wf:
             secret_key = wf.read().strip().encode('utf-8')
