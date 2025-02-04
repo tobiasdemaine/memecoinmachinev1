@@ -4,6 +4,13 @@
 ./install.sh
 '''
 
+## Python ENV
+
+Always run the python environment
+'''
+source .venv/bin/activate
+'''
+
 ## Create Base Account
 
 This account is where all profit sol is paid into

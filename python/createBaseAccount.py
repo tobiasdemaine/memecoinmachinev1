@@ -21,6 +21,6 @@ def prompt_overwrite(filepath):
 prompt_overwrite("tokens/keys/base-keypair.json")
 
 
-run_command(f"solana-keygen new --outfile tokens/keys/base-keypair.json --force --starts-with bas:1")
+run_command(f"solana-keygen new --outfile tokens/keys/base-keypair.json --force")
 
 print(f"Generated base keypair @ tokens/keys/base-keypair.json")

@@ -1,42 +1,4 @@
 {
-  "SOL_AMOUNT": 1,
-  "mode": "DEV",
-  "url": "https://www.littlecpaitalist.com/",
-  "domain": "littlecapitalist.com",
-  "ip4": "192.168.0.1",
-  "ip6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-  "ssh_user": "root",
-  "ssh_password": "password",
-  "RPC_MAIN": "https://mainnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
-  "RPC_DEV": "https://devnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
-  "ipfsLogoLink": "",
-  "ipfsMetaDataLink": "",
-  "wallets": {
-    "NUM_RECIPIENTS": 20
-  },
-  "decimals": 8,
-  "initialSupply": 10000000,
-  "tokeData": {
-    "decimals": 8,
-    "name": "Little",
-    "tokenAccount": "",
-    "mintAccount": "",
-    "mintAuthority": "",
-    "symbol": "LITTLE",
-    "lotSize": 0.1,
-    "tickSize": 0.001,
-    "addBaseAmountNumber": 9000000,
-    "addQuoteAmountNumber": 0,
-    "poolLockTime": 0
-  },
-  "metaData": {
-    "name": "Little",
-    "symbol": "LITTLE",
-    "description": "Token of the little project to create an open source interbank payment system.",
-    "image": "image_path",
-    "url": "https://www.littlecpaitalist.com/"
-  },
-  "website": {
     "symbol": "LITTLE",
     "gradientStart": "#6E7DFF",
     "gradientEnd": "#D4A5F9",
@@ -44,11 +6,11 @@
     "logo": "./images/logo.png",
     "documentPDF": "./pdf/document.pdf",
     "entityCopyrightFooter": "Shell",
-    "welcomeText": "Welcome to the Shell Token Farming Website",
-    "welcomeMessage": "Welcome to the Shell Token Farming Website. Here you can stake your Shell Tokens and earn rewards. The more Shell Tokens you stake, the more rewards you will earn. You can also earn rewards by referring your friends to the Shell Token Farming Website. For every friend you refer, you will earn a bonus reward. Start staking your Shell Tokens today and earn rewards!",
+    "welcomeText": "WEED",
+    "welcomeMessage": "The BEST Weed Coin in the world! There is none better!",
     "buttonA": "Learn More",
-    "buttonB": "Invest Now",
-    "buttonBLink": "https://www.shell.com/",
+    "buttonB": "Trade",
+    "buttonBLink": "https://raydium.io/swap/?inputMint=sol&outputMint=",
     "featuresA": "Feature A",
     "featuresAcontent": "Killer A5 Haze has been reported to provide significant relief for both chronic and acute pain, thanks to its high THC content, which interacts with the body's endocannabinoid system to reduce pain signals.",
     "featuresB": "Feature B",
@@ -60,24 +22,23 @@
     "documentBlock1Title": "Medical Properties",
     "documentBlock1Description": "Killer A5 Haze has been reported to provide significant relief for both chronic and acute pain, thanks to its high THC content, which interacts with the body's endocannabinoid system to reduce pain signals.",
     "documentBlock1LinkText": "Link Text",
-    "documentBlock1Link": "./images/document.pdf",
+    "documentBlock1Link": "./pdf/document.pdf",
     "documentBlock2Title": "Mood Enhancement",
     "documentBlock2Description": "Known for its psychoactive effects, this strain can help alleviate symptoms of depression and enhance mood, offering a sense of euphoria and mental clarity.",
-    "documentBlock2Link": "https://github.com",
+    "documentBlock2Link": "https://raydium.io/swap/?inputMint=sol&outputMint=",
     "documentBlock2LinkText": "Link Text",
     "menu": [
-      {
-        "name": "PDF",
-        "link": "./images/document.pdf"
-      },
-      {
-        "name": "GITHUB",
-        "link": "https://github.com/little"
-      },
-      {
-        "name": "Dex",
-        "link": "https://dexlink"
-      }
+        {
+            "name": "PDF",
+            "link": "./pdf/document.pdf"
+        },
+        {
+            "name": "GITHUB",
+            "link": "https://github.com/weed"
+        },
+        {
+            "name": "Dex",
+            "link": "https://raydium.io/swap/?inputMint=sol&outputMint="
+        }
     ]
-  }
 }

@@ -3,7 +3,7 @@ import json
 import sys
 
 # Load the base JSON file
-base_json_path = './tokenFarming/tokens/base.json'
+base_json_path = './base.json'
 with open(base_json_path, 'r') as f:
     data = json.load(f)
 
@@ -19,7 +19,7 @@ data['metaData']['symbol'] = symbol
 
 # Create the new file name
 new_file_name = f"{mode}_{symbol}.json"
-new_file_path = os.path.join('./tokenFarming/tokens', new_file_name)
+new_file_path = os.path.join('./tokens', new_file_name)
 
 # Save the new JSON file with the updated values
 with open(new_file_path, 'w') as f:

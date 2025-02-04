@@ -14,17 +14,28 @@ install_if_missing() {
 
 # Update package list and install Python
 sudo apt update
-sudo apt install -y python3 python3-pip
+sudo apt install -y python3 python3-pip python3-venv 
 
+python3 -m venv .venv
+source .venv/bin/activate
 # Install required Python libraries
 pip3 install solana
+pip3 install ndg-httpsclient
+pip3 install requests
+pip3 install pyopenssl
+pip3 install pyasn1
 
 # Verify installation
 python3 --version
 pip3 --version
 
+# Install Rust
+install_if_missing rustc "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+rustc -V
+rustup update
+
 # Install Solana CLI
-install_if_missing solana "sh -c \"\$(curl -sSfL https://release.solana.com/stable/install)\" && export PATH=\"\$HOME/.local/share/solana/install/active_release/bin:\$PATH\""
+install_if_missing solana "sh -c \"\$(curl -sSfL https://release.anza.xyz/stable/install)\" && export PATH=\"\$HOME/.local/share/solana/install/active_release/bin:\$PATH\""
 
 # Verify Solana installation
 solana --version
