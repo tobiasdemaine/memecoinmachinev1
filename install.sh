@@ -39,17 +39,6 @@ spl-token --version
 install_if_missing node "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs"  # Ubuntu/Debian
 install_if_missing yarn "npm install -g yarn"
 
-# Install Metaplex CLI
-#install_if_missing metaplex "npm install -g @metaplex/cli"
-
-# Verify Metaplex CLI installation
-#metaplex --version
-
-#install_if_missing raydium "npm install -g @raydium-io/cli"
-
-# Verify Raydium CLI installation
-#raydium --version
-
 echo "Installation complete! Please restart your terminal or run:"
 echo "export PATH=\"\$HOME/.local/share/solana/install/active_release/bin:\$PATH\""
 
