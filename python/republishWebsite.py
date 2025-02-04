@@ -24,27 +24,6 @@ def upload_and_unpack(ip_address, username, password, local_file, remote_dir):
     ssh.exec_command(f"rm {remote_file}")
     ssh.close()
 
-def start_docker_container(ip_address, username, password, mode, ticker, domain):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(ip_address, username=username, password=password)
-    ssh.exec_command("docker pull nginx")
-    docker_command = f"""
-    docker run --name frontend \
-    -v /root/tokens/{mode}_{ticker}:/usr/share/nginx/html:ro \
-    -v /root/tokens/nginx.conf:/etc/nginx/nginx.conf:ro -d \
-    -p 8888:80 \
-    --env "VIRTUAL_PORT=80"  \
-    --env "VIRTUAL_HOST={domain}"  \
-    --env "LETSENCRYPT_HOST={domain}" \
-    --env "LETSENCRYPT_EMAIL=tobiase@demaine.studio" \
-    nginx
-    """
-    print(docker_command)
-    stdin, stdout, stderr = ssh.exec_command(docker_command)
-    print(stdout.read().decode())
-    print(stderr.read().decode())
-    ssh.close()
 
 def main(json_file_path):
     with open(json_file_path, 'r') as f:
@@ -63,7 +42,6 @@ def main(json_file_path):
     compress_directory(source_dir, output_filename)
     upload_and_unpack(ip_address, username, password, output_filename, f"/root/tokens")
     os.remove(output_filename)
-    start_docker_container(ip_address, username, password, mode, ticker, domain)
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
