@@ -28,13 +28,16 @@ const main = async () => {
   const lotSize = new BN(config.tokenData.lotSize);
   const tickSize = new BN(config.tokenData.tickSize);
 
-  const targetMarketId = await createMarket({
-    baseToken,
-    quoteToken: DEFAULT_TOKEN.WSOL,
-    lotSize,
-    tickSize,
-    wallet: myKeyPair,
-  });
+  const targetMarketId = await createMarket(
+    {
+      baseToken,
+      quoteToken: DEFAULT_TOKEN.WSOL,
+      lotSize,
+      tickSize,
+      wallet: myKeyPair,
+    },
+    config.mode
+  );
 
   const addBaseAmount = new BN(
     config.tokenData.addBaseAmountNumber * 10 ** config.tokenData.decimals
@@ -70,15 +73,18 @@ const main = async () => {
   }
 
   console.log("Creating Pool...");
-  const targetPoolPubkey = await createPool({
-    baseToken,
-    quoteToken: DEFAULT_TOKEN.WSOL,
-    addBaseAmount,
-    addQuoteAmount,
-    targetMarketId,
-    startTime,
-    walletTokenAccounts,
-  });
+  const targetPoolPubkey = await createPool(
+    {
+      baseToken,
+      quoteToken: DEFAULT_TOKEN.WSOL,
+      addBaseAmount,
+      addQuoteAmount,
+      targetMarketId,
+      startTime,
+      walletTokenAccounts,
+    },
+    config.mode
+  );
 
   // const targetPool = '9cAk6wsiehHoPyEwUJ9Vy8fpb5iHz5uCupgAMRKxVfbN' // replace pool id
   const targetPool = targetPoolPubkey.toString();

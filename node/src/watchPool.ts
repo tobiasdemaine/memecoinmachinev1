@@ -1,4 +1,4 @@
-import { Connection, PublicKey, Keypair } from "@solana/web3.js";
+import { PublicKey, Keypair } from "@solana/web3.js";
 import {
   LIQUIDITY_STATE_LAYOUT_V4,
   getMultipleAccountsInfo,
@@ -17,7 +17,7 @@ import {
   formatAmmKeysById,
   getWalletTokenAccount,
 } from "./lib/util";
-import { makeTxVersion } from "./config";
+import { connection, makeTxVersion } from "./config";
 import { exec } from "child_process";
 
 // --- CONFIGURATION ---
@@ -27,12 +27,6 @@ if (!configFilePath) {
 }
 const config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
 const kname = config.mode + "_" + config.metadata.symbol;
-
-let RPC_URL = "https://api.mainnet-beta.solana.com";
-if (config.mode == "DEV") {
-  RPC_URL = "https://api.dev.solana.com";
-}
-const connection = new Connection(RPC_URL, "confirmed");
 
 const pool_wallet_file = "../tokens/keys/" + kname + "-keypair.json";
 const POOL_WALLET_SECRET = JSON.parse(
@@ -55,7 +49,9 @@ const WITHDRAW_AMOUNT = parseFloat(config.WITHDRAW_AMOUNT);
 async function getLiquidityPool(tokenPair: string): Promise<PublicKey | null> {
   console.log(`Fetching liquidity pool for ${tokenPair}...`);
   const response = await fetch(
-    "https://api.raydium.io/v2/sdk/liquidity/mainnet.json"
+    config.mode == "PROD"
+      ? "https://api.raydium.io/v2/sdk/liquidity/mainnet.json"
+      : "https://api.raydium.io/v2/sdk/liquidity/devnet.json"
   );
   const pools = await response.json();
 
@@ -225,7 +221,8 @@ async function monitorAndWithdraw() {
       `🎯 Target reached! Withdrawing ${WITHDRAW_AMOUNT} LP tokens...`
     );
     await withdrawFromPool(poolWallet, lpMint, WITHDRAW_AMOUNT);
-
+    console.log(`😴 Sleeping for 1 minute...`);
+    await new Promise((resolve) => setTimeout(resolve, 60000));
     console.log(`💰 Withdrawing funds to storage wallet...`);
     await transferToStorage(
       pool_wallet_file,

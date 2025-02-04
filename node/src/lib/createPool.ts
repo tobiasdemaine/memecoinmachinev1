@@ -13,9 +13,9 @@ import {
 } from "../config.js";
 import { buildAndSendTx } from "./util.js";
 
-async function createPool(params) {
+async function createPool(params, mode) {
   const RAYDIUM_PROGRAM_ID =
-    process.env.NETWORK == "mainnet" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
+    mode == "PROD" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
 
   const myPublicKey = myKeyPair.publicKey;
 

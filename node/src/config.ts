@@ -1,5 +1,5 @@
 import { Connection, Keypair, PublicKey } from "@solana/web3.js";
-import bs58 from "bs58";
+import fs from "fs";
 import {
   Currency,
   Token,
@@ -8,19 +8,23 @@ import {
   LOOKUP_TABLE_CACHE,
 } from "@raydium-io/raydium-sdk";
 
-import dotenv from "dotenv";
-dotenv.config({ path: `.env.${process.env.NETWORK}` });
+const makeTxVersion = TxVersion.V0;
+const configPath = process.argv[2];
+const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
-const connection = new Connection(process.env.RPC_URL); // helius
+const connection = new Connection(
+  config.mode == "PROD" ? config.RPC_MAIN : config.RPC_DEV
+); // helius
 
-const myKeyPair = Keypair.fromSecretKey(
-  new Uint8Array(bs58.decode(process.env.PRIVATE_KEY))
+const kname = config.mode + "_" + config.metadata.symbol;
+const POOL_WALLET_SECRET = JSON.parse(
+  fs.readFileSync("../tokens/keys/" + kname + "-keypair.json", "utf8")
 );
 
-const makeTxVersion = TxVersion.V0;
+const myKeyPair = Keypair.fromSecretKey(new Uint8Array(POOL_WALLET_SECRET));
 
 const addLookupTableInfo =
-  process.env.NETWORK == "mainnet" ? LOOKUP_TABLE_CACHE : undefined;
+  config.mode == "PROD" ? LOOKUP_TABLE_CACHE : undefined;
 
 const CONFIG_MAINNET_PROGRAM_ID = {
   AMM_OWNER: new PublicKey("GThUX1Atko4tqhN2NaiTazWSeFWMuiUvfFnyJyUghFMJ"),
@@ -37,9 +41,7 @@ const CONFIG_DEVNET_PROGRAM_ID = {
 };
 
 const CONFIG_PROGRAM_ID =
-  process.env.NETWORK == "mainnet"
-    ? CONFIG_MAINNET_PROGRAM_ID
-    : CONFIG_DEVNET_PROGRAM_ID;
+  config.mode == "PROD" ? CONFIG_MAINNET_PROGRAM_ID : CONFIG_DEVNET_PROGRAM_ID;
 
 const DEFAULT_TOKEN = {
   SOL: new Currency(9, "USDC", "USDC"),

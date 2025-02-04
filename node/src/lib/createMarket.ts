@@ -6,9 +6,9 @@ import {
 import { connection, makeTxVersion } from "../config";
 import { buildAndSendTx } from "./util";
 
-async function createMarket(input) {
+async function createMarket(input, mode) {
   const RAYDIUM_PROGRAM_ID =
-    process.env.NETWORK == "mainnet" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
+    mode == "PROD" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
 
   // -------- step 1: make instructions --------
   const createMarketInstruments =

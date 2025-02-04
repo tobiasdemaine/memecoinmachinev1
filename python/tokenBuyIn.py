@@ -6,6 +6,7 @@ from solana.keypair import Keypair
 from solana.publickey import PublicKey
 from solana.transaction import Transaction
 from solana.system_program import TransferParams, transfer
+import time
 
 # Check for required arguments
 if len(sys.argv) < 2:
@@ -37,12 +38,12 @@ with open(WALLETS_FILE, 'r') as file:
         wallet_address, wallet_file = line.strip().split("->")
         print(f"Using wallet: {wallet_address} ({wallet_file})")
         # Load the wallet keypair
-        with open("../tokens/wallets/"+wallet_file, 'r') as wf:
+        with open("./tokens/wallets/"+wallet_file, 'r') as wf:
             secret_key = wf.read().strip().encode('utf-8')
         #wallet = Keypair.from_secret_key(secret_key)
 
         # Construct the command to run the TypeScript script
-        command = f"ts-node ../node/buyInToken.ts ../{json_file_path} {secret_key}"
+        command = f"cd ./node && ts-node ./src/buyInToken.ts ../{json_file_path} {secret_key}"
 
         # Execute the command
         result = os.system(command)
@@ -52,5 +53,7 @@ with open(WALLETS_FILE, 'r') as file:
             print(f"Failed to execute buy-in for wallet: {wallet_address}")
         else:
             print(f"Successfully executed buy-in for wallet: {wallet_address}")
+        print("snoozing for 1 second")
+        time.sleep(1)
 
 print("Token buy-in process complete!")

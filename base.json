@@ -5,13 +5,17 @@
   "domain": "littlecapitalist.com",
   "ip4": "192.168.0.1",
   "ip6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+  "ssh_user": "root",
+  "ssh_password": "password",
+  "RPC_MAIN": "https://mainnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
+  "RPC_DEV": "https://devnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
   "ipfsLogoLink": "",
   "ipfsMetaDataLink": "",
   "wallets": {
     "NUM_RECIPIENTS": 20
   },
   "decimals": 8,
-  "initialSupply": 1000000,
+  "initialSupply": 10000000,
   "tokeData": {
     "decimals": 8,
     "name": "Little",
@@ -21,8 +25,8 @@
     "symbol": "LITTLE",
     "lotSize": 0.1,
     "tickSize": 0.001,
-    "addBaseAmountNumber": 1000,
-    "addQuoteAmountNumber": 1000,
+    "addBaseAmountNumber": 9000000,
+    "addQuoteAmountNumber": 0,
     "poolLockTime": 0
   },
   "metaData": {
