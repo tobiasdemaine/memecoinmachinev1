@@ -33,7 +33,7 @@ def main():
         run_command(f"solana airdrop 2 {mint_authority}")
     if config["mode"] == "PROD":
         run_command(f"solana config set --url mainnet")
-        run_command(f"solana transfer --keypair ./my_wallet.json --to {mint_authority} {sol_amount}")
+        run_command(f"solana transfer --keypair ./tokens/keys/base-keypair.json --to {mint_authority} {sol_amount}")
 
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --starts-with mnt:1")
    

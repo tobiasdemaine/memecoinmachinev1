@@ -28,7 +28,7 @@ def main(json_file_path):
 
     # Copy JSON file's website parameter to a specific location
     website_data = data['website']
-    website_data_path = './token/src/data/data.json'
+    website_data_path = './reactApp/token/src/data/data.json'
     os.makedirs(os.path.dirname(website_data_path), exist_ok=True)
     with open(website_data_path, 'w') as f:
         json.dump(website_data, f, indent=4)
