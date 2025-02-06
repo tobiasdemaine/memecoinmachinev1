@@ -10,7 +10,7 @@
   "RPC_MAIN": "https://mainnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
   "RPC_DEV": "https://devnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
   "ipfsLogoLink": "",
-  "ipfsMetaDataLink": "",
+  "ipfsJsonLink": "",
   "wallets": {
     "NUM_RECIPIENTS": 20
   },

@@ -17,10 +17,14 @@ def prompt_overwrite(filepath):
         if response != 'y':
             print("Operation cancelled.")
             exit(0)
+def createBaseAccount():
+    prompt_overwrite("tokens/keys/base-keypair.json")
 
-prompt_overwrite("tokens/keys/base-keypair.json")
 
+    run_command(f"solana-keygen new --outfile tokens/keys/base-keypair.json --force  --no-passphrase")
 
-run_command(f"solana-keygen new --outfile tokens/keys/base-keypair.json --force")
+    print(f"Generated base keypair @ tokens/keys/base-keypair.json")
+    
 
-print(f"Generated base keypair @ tokens/keys/base-keypair.json")
+if __name__ == '__main__':
+    createBaseAccount()

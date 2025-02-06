@@ -7,7 +7,7 @@ import requests
 import re
 
 
-def main(json_file_path):
+def regenerateSite(json_file_path):
     # Load JSON file
     with open(json_file_path, 'r') as f:
         data = json.load(f)
@@ -59,4 +59,4 @@ if __name__ == '__main__':
         print("Usage: python script.py <path_to_json_file>")
         sys.exit(1)
     json_file_path = sys.argv[1]
-    main(json_file_path)
+    regenerateSite(json_file_path)

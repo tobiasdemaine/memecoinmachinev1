@@ -20,39 +20,37 @@ def main():
         config = json.load(f)
 
     kname = config["mode"] + "_" + config['metaData']['symbol']
-    sol_amount = config["sol_amount"]
+    sol_amount = config["SOL_AMOUNT"]
     # Generate a keypair for the token mint
     print("Generating token mint keypair...")
-    run_command(f"solana-keygen new --outfile tokens/keys/{kname}-keypair.json --force --starts-with bos:1")
+    run_command(f"solana-keygen new --outfile tokens/keys/{kname}-keypair.json --force --no-passphrase")
     run_command(f"solana config set --keypair tokens/keys/{kname}-keypair.json")
-    mint_authority = run_command(f"solana-keygen pubkey {kname}-keypair.json")
-    print(f"Token mint address: {mint_authority}")
+    mint_authority = run_command(f"solana-keygen pubkey tokens/keys/{kname}-keypair.json")
+    print(f"Token mint authority: {mint_authority}")
 
     if config["mode"] == "DEV":
         run_command(f"solana config set --url devnet")
-        run_command(f"solana airdrop 2 {mint_authority}")
+        run_command(f"solana airdrop 0.5 {mint_authority}")
     if config["mode"] == "PROD":
         run_command(f"solana config set --url mainnet")
         run_command(f"solana transfer --keypair ./tokens/keys/base-keypair.json --to {mint_authority} {sol_amount}")
 
-    run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --starts-with mnt:1")
+    run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --no-passphrase")
    
     mint_account = run_command(f"solana-keygen pubkey tokens/keys/{kname}-mintaccount-keypair.json")
-    print(f"Token mint address: {mint_account}")
+    print(f"Token mint account: {mint_account}")
    
 
     decimals = config['decimals']
     token_name = config['metaData']['name']
     token_symbol = config['metaData']['symbol']
-    metadata_uri = config['ipfsMetaDataLink']
+    metadata_uri = config["ipfsJsonLink"]
 
     # Create the token mint account with metadata enabled
     print("Creating token mint account...")
-    run_command(f"spl-token create-token --mint-authority {mint_authority} --decimals {decimals} --enable-metadata --name {token_name} --symbol {token_symbol} --uri {metadata_uri} --mint {mint_authority}")
+    run_command(f"spl-token create-token --decimals {decimals} --program-id TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb --enable-metadata tokens/keys/{kname}-mintaccount-keypair.json")
 
-    run_command(f"spl-token create-token --program-id TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb --enable-metadata tokens/keys/{kname}-mintaccount-keypair.json")
-
-    run_command(f"spl-token initialize-metadata {mint_account} {config.metaData.name} {config.metaData.symbol} {config.ipfsMetaDataLink}")
+    run_command(f"spl-token initialize-metadata {mint_account} '{token_name}' '{token_symbol}' {metadata_uri}")
     # Create a token account
     print("Creating token account...")
     token_account = run_command(f"spl-token create-account {mint_account} | grep -oP 'Creating account \\K\\S+'")
@@ -61,15 +59,15 @@ def main():
     # Mint initial supply
     initial_supply = config['initialSupply']
     print(f"Minting {initial_supply} tokens to token account...")
-    run_command(f"spl-token mint {mint_authority} {initial_supply} {token_account}")
+    run_command(f"spl-token mint {mint_account} {initial_supply} {token_account}")
 
     # Use Metaplex to update metadata
-    #print("Updating metadata using Metaplex...")
-    #run_command(f"metaplex tokens update-metadata --mint {mint_authority} --name \"{token_name}\" --symbol \"{token_symbol}\" --uri \"{metadata_uri}\"")
+    # print("Updating metadata using Metaplex...")
+    # run_command(f"metaplex tokens update-metadata --mint {mint_authority} --name \"{token_name}\" --symbol \"{token_symbol}\" --uri \"{metadata_uri}\"")
 
     print("Token creation complete with metadata!")
     print(f"Token Mint Authority Address: {mint_authority}")
-    print(f"Token Mint Address: {mint_account}")
+    print(f"Token Mint Account Address: {mint_account}")
     print(f"Token Account Address: {token_account}")
     print(f"Metadata URI: {metadata_uri}")
 

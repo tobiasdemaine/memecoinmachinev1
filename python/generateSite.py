@@ -17,7 +17,7 @@ def upload_to_ipfs(file_path):
     result = subprocess.run(command, capture_output=True, text=True)
     return json.loads(result.stdout)['Hash']
 
-def main(json_file_path):
+def generateSite(json_file_path):
     # Load JSON file
     with open(json_file_path, 'r') as f:
         data = json.load(f)
@@ -88,4 +88,4 @@ if __name__ == '__main__':
         print("Usage: python script.py <path_to_json_file>")
         sys.exit(1)
     json_file_path = sys.argv[1]
-    main(json_file_path)
+    generateSite(json_file_path)
