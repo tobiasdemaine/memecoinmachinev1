@@ -11,7 +11,12 @@ import {
   TOKEN_PROGRAM_ID,
   InnerSimpleV0Transaction,
 } from "@raydium-io/raydium-sdk";
-import { PublicKey, SendOptions, VersionedTransaction } from "@solana/web3.js";
+import {
+  Connection,
+  PublicKey,
+  SendOptions,
+  VersionedTransaction,
+} from "@solana/web3.js";
 
 import {
   myKeyPair,
@@ -33,13 +38,13 @@ async function sendTx(connection, payer, txs, options) {
   return txids;
 }
 
-async function getWalletTokenAccount(connection, myKeyPair) {
-  const walletTokenAccount = await connection.getTokenAccountsByOwner(
-    myKeyPair,
-    {
-      programId: TOKEN_PROGRAM_ID,
-    }
-  );
+async function getWalletTokenAccount(
+  connection: Connection,
+  pubKey: PublicKey
+) {
+  const walletTokenAccount = await connection.getTokenAccountsByOwner(pubKey, {
+    programId: TOKEN_PROGRAM_ID,
+  });
   return walletTokenAccount.value.map((i) => ({
     pubkey: i.pubkey,
     programId: i.account.owner,

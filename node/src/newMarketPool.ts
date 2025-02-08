@@ -28,7 +28,7 @@ const main = async () => {
 
   const baseToken = new Token(
     TOKEN_PROGRAM_ID,
-    new PublicKey(config.tokenData.mintAuthority),
+    new PublicKey(config.tokenData.mintAccount),
     config.tokenData.decimals,
     config.tokenData.symbol,
     config.tokenData.tokenName
@@ -60,7 +60,7 @@ const main = async () => {
   while (!found) {
     walletTokenAccounts = await getWalletTokenAccount(
       connection,
-      config.tokenData.mintAuthority
+      new PublicKey(config.tokenData.mintAuthority)
     );
     walletTokenAccounts.forEach((tokenAccount) => {
       if (

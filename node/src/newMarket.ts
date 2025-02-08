@@ -17,7 +17,7 @@ const main = async () => {
 
   const baseToken = new Token(
     TOKEN_PROGRAM_ID,
-    new PublicKey(config.tokenData.mintAuthority),
+    new PublicKey(config.tokenData.mintAccount),
     config.tokenData.decimals,
     config.tokenData.symbol,
     config.tokenData.tokenName
