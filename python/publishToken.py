@@ -2,16 +2,15 @@ import sys
 import json
 import subprocess
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python publishToken.py <json_file>")
-        sys.exit(1)
-
-    json_file = sys.argv[1]
+def publishToken(json_file):
+    
 
     try:
         with open(json_file, 'r') as file:
             args = json.load(file)
+            if args["tokenData"]["poolAddress"] != "":
+                print("Pool address already exists. Exiting.")
+                sys.exit(1)
     except Exception as e:
         print(f"Error reading JSON file: {e}")
         sys.exit(1)
@@ -31,4 +30,9 @@ def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python publishToken.py <json_file>")
+        sys.exit(1)
+
+    json_file = sys.argv[1]
+    publishToken(json_file)

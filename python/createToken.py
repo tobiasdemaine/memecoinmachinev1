@@ -80,7 +80,7 @@ def main():
     config['tokenData']['metadata'] = metadata_uri
 
     with open(json_file_path, 'w') as f:
-        json.dump(data, f, indent=4)
+        json.dump(config, f, indent=4)
 
 if __name__ == "__main__":
     main()

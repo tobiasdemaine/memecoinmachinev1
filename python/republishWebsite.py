@@ -25,7 +25,7 @@ def upload_and_unpack(ip_address, username, password, local_file, remote_dir):
     ssh.close()
 
 
-def main(json_file_path):
+def republishWebsite(json_file_path):
     with open(json_file_path, 'r') as f:
         data = json.load(f)
 
@@ -48,4 +48,4 @@ if __name__ == '__main__':
         print("Usage: python script.py <path_to_json_file>")
         sys.exit(1)
     json_file_path = sys.argv[1]
-    main(json_file_path)
+    republishWebsite(json_file_path)
