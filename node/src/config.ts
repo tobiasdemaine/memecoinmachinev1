@@ -11,12 +11,11 @@ import {
 const makeTxVersion = TxVersion.V0;
 const configPath = process.argv[2];
 const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
-
 const connection = new Connection(
   config.mode == "PROD" ? config.RPC_MAIN : config.RPC_DEV
 ); // helius
 
-const kname = config.mode + "_" + config.metadata.symbol;
+const kname = config.mode + "_" + config.metaData.symbol;
 const POOL_WALLET_SECRET = JSON.parse(
   fs.readFileSync("../tokens/keys/" + kname + "-keypair.json", "utf8")
 );

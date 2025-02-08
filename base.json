@@ -25,11 +25,12 @@
     "mintAccount": "",
     "mintAuthority": "",
     "poolMintAccount": "",
+    "targetMarketId": "",
     "symbol": "LITTLE",
-    "lotSize": 0.1,
-    "tickSize": 0.001,
+    "lotSize": 1,
+    "tickSize": 0.01,
     "addBaseAmountNumber": 9000000,
-    "addQuoteAmountNumber": 0,
+    "addQuoteAmountNumber": 0.2,
     "poolLockTime": 0
   },
   "metaData": {

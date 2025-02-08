@@ -1,9 +1,8 @@
-import { createMarket } from "./lib/createMarket";
 import fs from "fs";
 import { getWalletTokenAccount, sleepTime } from "./lib/util";
 import BN from "bn.js";
 import { createPool } from "./lib/createPool";
-import { connection, myKeyPair, DEFAULT_TOKEN } from "./config";
+import { connection, DEFAULT_TOKEN } from "./config";
 import { PublicKey } from "@solana/web3.js";
 import { Token, TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
 
@@ -15,8 +14,8 @@ const main = async () => {
 
   const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
-  if (config.tokenData.targetMarketId !== "") {
-    console.log("Target Market ID is already set. Exiting...");
+  if (config.tokenData.targetMarketId === "") {
+    console.log("Target Market ID is empty. Exiting...");
     return;
   }
   if (config.tokenData.poolMintAccount !== "") {
@@ -24,25 +23,12 @@ const main = async () => {
     return;
   }
 
-  console.log("Creating Market...");
-
   const baseToken = new Token(
     TOKEN_PROGRAM_ID,
     new PublicKey(config.tokenData.mintAuthority),
     config.tokenData.decimals,
     config.tokenData.symbol,
     config.tokenData.tokenName
-  );
-
-  const targetMarketId = await createMarket(
-    {
-      baseToken,
-      quoteToken: DEFAULT_TOKEN.WSOL,
-      lotSize: config.tokenData.lotSize,
-      tickSize: config.tokenData.tickSize,
-      wallet: myKeyPair,
-    },
-    config.mode
   );
 
   const addBaseAmount = new BN(
@@ -85,7 +71,7 @@ const main = async () => {
       quoteToken: DEFAULT_TOKEN.WSOL,
       addBaseAmount,
       addQuoteAmount,
-      targetMarketId,
+      targetMarketId: config.tokenData.targetMarketId,
       startTime,
       walletTokenAccounts,
     },
@@ -96,7 +82,6 @@ const main = async () => {
   const targetPool = targetPoolPubkey.toString();
   console.log(targetPool);
   config.tokenData.poolMintAccount = targetPool;
-  config.tokenData.targetMarketId = targetMarketId;
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   console.log("Config file updated with targetPool.");

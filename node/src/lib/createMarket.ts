@@ -10,6 +10,7 @@ async function createMarket(input, mode) {
   const RAYDIUM_PROGRAM_ID =
     mode == "PROD" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
 
+  // console.log(input, RAYDIUM_PROGRAM_ID);
   // -------- step 1: make instructions --------
   const createMarketInstruments =
     await MarketV2.makeCreateMarketInstructionSimple({

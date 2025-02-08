@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 from createBaseAccount import createBaseAccount
 from tokenFarming.python.publishToken import publishToken
+from tokenFarming.python.publishTokenMarket import publishTokenMarket
+from tokenFarming.python.publishTokenPool import publishTokenPool
 from tokenStart import update_json_file
 from generateSite import generateSite
 from regenerateSite import regenerateSite
@@ -104,11 +106,35 @@ def republishsite():
     return jsonify({"success": True, "data": data}), 200
 
 @app.route('/publishtoken', methods=['POST'])
-def republishsite():
+def publishtoken():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
     try:
         publishToken(filePath(mode, symbol))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    with open(filePath(mode, symbol), 'r') as file:
+        data = file.read()
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/publishtokenmarket', methods=['POST'])
+def publishtokenmarket():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    try:
+        publishTokenMarket(filePath(mode, symbol))
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+    with open(filePath(mode, symbol), 'r') as file:
+        data = file.read()
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/publishtokenpool', methods=['POST'])
+def publishtokenmarket():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    try:
+        publishTokenPool(filePath(mode, symbol))
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
     with open(filePath(mode, symbol), 'r') as file:

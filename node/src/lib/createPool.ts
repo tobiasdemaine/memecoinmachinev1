@@ -10,8 +10,8 @@ import {
   makeTxVersion,
   CONFIG_PROGRAM_ID,
   myKeyPair,
-} from "../config.js";
-import { buildAndSendTx } from "./util.js";
+} from "../config";
+import { buildAndSendTx } from "./util";
 
 async function createPool(params, mode) {
   const RAYDIUM_PROGRAM_ID =
