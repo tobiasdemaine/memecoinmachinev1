@@ -1,10 +1,11 @@
 import fs from "fs";
 import { getWalletTokenAccount, sleepTime } from "./lib/util";
-import BN from "bn.js";
 import { createPool } from "./lib/createPool";
 import { connection, DEFAULT_TOKEN } from "./config";
 import { PublicKey } from "@solana/web3.js";
-import { Token, TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
+import { Token } from "@raydium-io/raydium-sdk";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+import { BN } from "bn.js";
 
 const main = async () => {
   const configPath = process.argv[2];
@@ -31,10 +32,10 @@ const main = async () => {
     config.tokenData.tokenName
   );
 
-  const addBaseAmount = new BN(
+  const addBaseAmount = BigInt(
     config.tokenData.addBaseAmountNumber * 10 ** config.tokenData.decimals
   ); // custom token
-  const addQuoteAmount = new BN(
+  const addQuoteAmount = BigInt(
     config.tokenData.addQuoteAmountNumber * 10 ** 9
   ); // WSOL
 
@@ -62,22 +63,23 @@ const main = async () => {
       await sleepTime(1000); // Wait for 1 seconds before retrying
     }
   }
+  console.log(walletTokenAccounts);
 
   console.log("Creating Pool...");
+
   const targetPoolPubkey = await createPool(
     {
       baseToken,
       quoteToken: DEFAULT_TOKEN.WSOL,
-      addBaseAmount,
-      addQuoteAmount,
-      targetMarketId: config.tokenData.targetMarketId,
+      addBaseAmount: new BN(addBaseAmount.toString()),
+      addQuoteAmount: new BN(addQuoteAmount.toString()),
+      targetMarketId: new PublicKey(config.tokenData.targetMarketId),
       startTime,
       walletTokenAccounts,
     },
     config.mode
   );
 
-  // const targetPool = '9cAk6wsiehHoPyEwUJ9Vy8fpb5iHz5uCupgAMRKxVfbN' // replace pool id
   const targetPool = targetPoolPubkey.toString();
   console.log(targetPool);
   config.tokenData.poolMintAccount = targetPool;

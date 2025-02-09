@@ -33,7 +33,32 @@ async function createPool(params, mode) {
   //     marketProgramId: RAYDIUM_PROGRAM_ID.OPENBOOK_MARKET,
   // })
   // const poolId = associatedPoolKeys.id
-
+  console.log({
+    connection: connection,
+    programId: RAYDIUM_PROGRAM_ID.AmmV4,
+    // programId: CONFIG_PROGRAM_ID.AMM_OWNER,
+    marketInfo: {
+      marketId: params.targetMarketId,
+      programId: RAYDIUM_PROGRAM_ID.OPENBOOK_MARKET,
+    },
+    baseMintInfo: params.baseToken,
+    quoteMintInfo: params.quoteToken,
+    baseAmount: params.addBaseAmount,
+    quoteAmount: params.addQuoteAmount,
+    startTime: new BN(Math.floor(params.startTime)),
+    ownerInfo: {
+      feePayer: myPublicKey,
+      wallet: myPublicKey,
+      tokenAccounts: params.walletTokenAccounts,
+      useSOLBalance: true, // if has WSOL mint
+    },
+    associatedOnly: false,
+    // computeBudgetConfig?,
+    checkCreateATAOwner: true,
+    makeTxVersion: makeTxVersion,
+    // lookupTableCache?,
+    feeDestinationId: CONFIG_PROGRAM_ID.CREATE_POOL_FEE_ADDRESS,
+  });
   const initPoolInstructionResponse =
     await Liquidity.makeCreatePoolV4InstructionV2Simple({
       connection: connection,

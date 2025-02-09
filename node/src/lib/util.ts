@@ -8,7 +8,6 @@ import {
   LIQUIDITY_STATE_LAYOUT_V4,
   MARKET_STATE_LAYOUT_V3,
   SPL_MINT_LAYOUT,
-  TOKEN_PROGRAM_ID,
   InnerSimpleV0Transaction,
 } from "@raydium-io/raydium-sdk";
 import {
@@ -24,6 +23,8 @@ import {
   makeTxVersion,
   addLookupTableInfo,
 } from "../config";
+
+import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
 
 async function sendTx(connection, payer, txs, options) {
   const txids = [];
@@ -43,7 +44,7 @@ async function getWalletTokenAccount(
   pubKey: PublicKey
 ) {
   const walletTokenAccount = await connection.getTokenAccountsByOwner(pubKey, {
-    programId: TOKEN_PROGRAM_ID,
+    programId: TOKEN_2022_PROGRAM_ID,
   });
   return walletTokenAccount.value.map((i) => ({
     pubkey: i.pubkey,

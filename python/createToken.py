@@ -48,7 +48,7 @@ def main():
 
     # Create the token mint account with metadata enabled
     print("Creating token mint account...")
-    run_command(f"spl-token create-token --decimals {decimals} --program-id TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb --enable-metadata tokens/keys/{kname}-mintaccount-keypair.json")
+    run_command(f"spl-token create-token --decimals {decimals} --enable-metadata tokens/keys/{kname}-mintaccount-keypair.json")
 
     run_command(f"spl-token initialize-metadata {mint_account} '{token_name}' '{token_symbol}' {metadata_uri}")
     # Create a token account
@@ -61,9 +61,10 @@ def main():
     print(f"Minting {initial_supply} tokens to token account...")
     run_command(f"spl-token mint {mint_account} {initial_supply} {token_account}")
 
-    # Use Metaplex to update metadata
-    # print("Updating metadata using Metaplex...")
-    # run_command(f"metaplex tokens update-metadata --mint {mint_authority} --name \"{token_name}\" --symbol \"{token_symbol}\" --uri \"{metadata_uri}\"")
+    run_command(f"spl-token authorize {mint_account} mint --disable")
+    #run_command(f"spl-token authorize {mint_account} freeze --disable")
+    run_command(f"spl-token authorize {mint_account} metadata --disable")
+    #run_command(f"spl-token authorize {mint_account} metadata-pointer --disable") 
 
     print("Token creation complete with metadata!")
     print(f"Token Mint Authority Address: {mint_authority}")

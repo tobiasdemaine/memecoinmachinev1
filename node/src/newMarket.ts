@@ -3,7 +3,8 @@ import fs from "fs";
 
 import { myKeyPair, DEFAULT_TOKEN } from "./config";
 import { PublicKey } from "@solana/web3.js";
-import { Token, TOKEN_PROGRAM_ID } from "@raydium-io/raydium-sdk";
+import { Token } from "@raydium-io/raydium-sdk";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 const main = async () => {
   const configPath = process.argv[2];
