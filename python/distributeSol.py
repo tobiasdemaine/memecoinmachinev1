@@ -1,8 +1,16 @@
 import os
+import subprocess
 import time
 import json
-from solana.keypair import Keypair
 import sys
+
+def run_command(command):
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Error running command: {command}")
+        print(result.stderr)
+        exit(1)
+    return result.stdout.strip()
 
 if len(sys.argv) < 2:
     print("Usage: python3 distributeSol.py <JSON_FILE>")
@@ -21,17 +29,14 @@ kname = config["mode"] + "_" + config['metaData']['symbol']
 # Generate wallets and save keypairs
 print(f"Generating {NUM_RECIPIENTS} wallets...")
 RECIPIENTS = []
+wallets = {}
 
 for i in range(1, NUM_RECIPIENTS + 1):
-    wallet = Keypair()
-    wallet_file = f"tokens/wallets/{kname}_wallet_{i}.json"
-    with open(wallet_file, 'w') as f:
-        f.write(wallet.secret_key.decode('utf-8'))
-    wallet_address = str(wallet.public_key)
+    command = run_command(f"solana-keygen new --outfile tokens/wallets/{kname}_wallet_{i}.json --force --no-passphrase")
+    wallet_address = run_command(f"solana-keygen pubkey tokens/wallets/{kname}_wallet_{i}.json")
     RECIPIENTS.append(wallet_address)
+    wallets[f"{wallet_address}"] = f"tokens/wallets/{kname}_wallet_{i}.json"
    
-    with open("tokens/wallets/{kname}_wallets.json", 'a') as f:
-        f.write(f"{wallet_address} -> {wallet_file}\n")
     print(f"Generated wallet #{i}: {wallet_address}")
 
 
@@ -41,5 +46,8 @@ for recipient in RECIPIENTS:
     command = f"solana transfer --keypair tokens/keys/{kname}-keypair.json --to {recipient} {SOL_PER_RECIPIENT}"
     time.sleep(1)  # Short delay to avoid rate limits
 
+with open(f"tokens/wallets/{kname}_wallets.json", 'w') as f:
+    json.dump(wallets, f, indent=4)
+
 print("Wallet generation and SOL distribution complete!")
-print(f"Wallets saved in {"tokens/wallets/{kname}_wallets.json"}")
+print(f"Wallets saved in tokens/wallets/{kname}_wallets.json")

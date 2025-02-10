@@ -1,11 +1,6 @@
 import json
 import os
 import sys
-from solana.rpc.api import Client
-from solana.keypair import Keypair
-from solana.publickey import PublicKey
-from solana.transaction import Transaction
-from solana.system_program import TransferParams, transfer
 import time
 
 # Check for required arguments

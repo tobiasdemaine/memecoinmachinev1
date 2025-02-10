@@ -14,7 +14,8 @@
   "ipfsLogoLink": "",
   "ipfsJsonLink": "",
   "wallets": {
-    "NUM_RECIPIENTS": 20
+    "NUM_RECIPIENTS": 20,
+    "BASE_AMOUNT": 1
   },
   "decimals": 8,
   "initialSupply": 10000000,

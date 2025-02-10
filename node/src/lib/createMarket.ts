@@ -12,6 +12,7 @@ async function createMarket(input, mode) {
 
   // console.log(input, RAYDIUM_PROGRAM_ID);
   // -------- step 1: make instructions --------
+
   const createMarketInstruments =
     await MarketV2.makeCreateMarketInstructionSimple({
       connection,
