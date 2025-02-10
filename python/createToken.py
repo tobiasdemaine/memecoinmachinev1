@@ -48,9 +48,9 @@ def main():
 
     # Create the token mint account with metadata enabled
     print("Creating token mint account...")
-    run_command(f"spl-token create-token --decimals {decimals} --enable-metadata tokens/keys/{kname}-mintaccount-keypair.json")
+    run_command(f"spl-token create-token --decimals {decimals} tokens/keys/{kname}-mintaccount-keypair.json")
 
-    run_command(f"spl-token initialize-metadata {mint_account} '{token_name}' '{token_symbol}' {metadata_uri}")
+    #run_command(f"spl-token initialize-metadata {mint_account} '{token_name}' '{token_symbol}' {metadata_uri}")
     # Create a token account
     print("Creating token account...")
     token_account = run_command(f"spl-token create-account {mint_account} | grep -oP 'Creating account \\K\\S+'")
@@ -61,11 +61,32 @@ def main():
     print(f"Minting {initial_supply} tokens to token account...")
     run_command(f"spl-token mint {mint_account} {initial_supply} {token_account}")
 
+   
+    metadata = {
+        "name": config['metaData']['name'],
+        "symbol": config['metaData']['symbol'],
+        "uri": config['ipfsJsonLink'],
+        "seller_fee_basis_points": 0,
+        "creators": [
+            {
+                "address": mint_authority,
+                "verified": True,
+                "share": 100
+            }
+        ]
+    }
+
+    with open(f"./tokens/{kname}_METABOSS.json", 'w') as f:
+        json.dump(metadata, f, indent=4)
+
+    # Add metadata to the Solana token with Metaboss
+    print("Adding metadata to the token with Metaboss...")
+    run_command(f"metaboss create metadata -a {mint_account} -m ./tokens/{kname}_METABOSS.json")
+
     run_command(f"spl-token authorize {mint_account} mint --disable")
     #run_command(f"spl-token authorize {mint_account} freeze --disable")
-    run_command(f"spl-token authorize {mint_account} metadata --disable")
-    #run_command(f"spl-token authorize {mint_account} metadata-pointer --disable") 
-
+    run_command(f"metaboss set immutable --account {mint_account}")
+    
     print("Token creation complete with metadata!")
     print(f"Token Mint Authority Address: {mint_authority}")
     print(f"Token Mint Account Address: {mint_account}")

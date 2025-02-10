@@ -51,6 +51,9 @@ spl-token --version
 install_if_missing node "curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash - && sudo apt-get install -y nodejs"  # Ubuntu/Debian
 install_if_missing yarn "npm install -g yarn"
 
+# Install Metaplex CLI
+install_if_missing metaboss "sudo apt install libssl-dev libudev-dev pkg-config && bash <(curl -sSf https://raw.githubusercontent.com/samuelvanderwaal/metaboss/main/scripts/install.sh)"
+
 echo "Installation complete! Please restart your terminal or run:"
 echo "export PATH=\"\$HOME/.local/share/solana/install/active_release/bin:\$PATH\""
 

@@ -30,7 +30,7 @@
     "lotSize": 1,
     "tickSize": 0.01,
     "addBaseAmountNumber": 9000000,
-    "addQuoteAmountNumber": 0.2,
+    "addQuoteAmountNumber": 1,
     "poolLockTime": 0
   },
   "metaData": {
@@ -38,7 +38,7 @@
     "symbol": "LITTLE",
     "description": "Token of the little project to create an open source interbank payment system.",
     "image": "image_path",
-    "url": "https://www.littlecpaitalist.com/"
+    "uri": "https://www.littlecpaitalist.com/"
   },
   "website": {
     "symbol": "LITTLE",

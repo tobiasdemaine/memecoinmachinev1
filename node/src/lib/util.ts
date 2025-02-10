@@ -9,6 +9,7 @@ import {
   MARKET_STATE_LAYOUT_V3,
   SPL_MINT_LAYOUT,
   InnerSimpleV0Transaction,
+  ApiPoolInfoV4,
 } from "@raydium-io/raydium-sdk";
 import {
   Connection,
@@ -24,7 +25,7 @@ import {
   addLookupTableInfo,
 } from "../config";
 
-import { TOKEN_2022_PROGRAM_ID } from "@solana/spl-token";
+import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 
 async function sendTx(connection, payer, txs, options) {
   const txids = [];
@@ -44,7 +45,7 @@ async function getWalletTokenAccount(
   pubKey: PublicKey
 ) {
   const walletTokenAccount = await connection.getTokenAccountsByOwner(pubKey, {
-    programId: TOKEN_2022_PROGRAM_ID,
+    programId: TOKEN_PROGRAM_ID,
   });
   return walletTokenAccount.value.map((i) => ({
     pubkey: i.pubkey,
@@ -85,9 +86,9 @@ async function sleepTime(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function formatAmmKeysById(id) {
+async function formatAmmKeysById(id: string): Promise<ApiPoolInfoV4> {
   const account = await connection.getAccountInfo(new PublicKey(id));
-
+  console.log("ACCOUNT", account, id);
   if (account === null) throw Error(" get id info error ");
   const info = LIQUIDITY_STATE_LAYOUT_V4.decode(account.data);
 

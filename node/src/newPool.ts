@@ -32,10 +32,10 @@ const main = async () => {
     config.tokenData.tokenName
   );
 
-  const addBaseAmount = BigInt(
+  const addBaseAmount = new BN(
     config.tokenData.addBaseAmountNumber * 10 ** config.tokenData.decimals
   ); // custom token
-  const addQuoteAmount = BigInt(
+  const addQuoteAmount = new BN(
     config.tokenData.addQuoteAmountNumber * 10 ** 9
   ); // WSOL
 
@@ -71,8 +71,8 @@ const main = async () => {
     {
       baseToken,
       quoteToken: DEFAULT_TOKEN.WSOL,
-      addBaseAmount: new BN(addBaseAmount.toString()),
-      addQuoteAmount: new BN(addQuoteAmount.toString()),
+      addBaseAmount: addBaseAmount,
+      addQuoteAmount: addQuoteAmount,
       targetMarketId: new PublicKey(config.tokenData.targetMarketId),
       startTime,
       walletTokenAccounts,
