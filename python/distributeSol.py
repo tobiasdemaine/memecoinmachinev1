@@ -43,7 +43,9 @@ for i in range(1, NUM_RECIPIENTS + 1):
 # Distribute SOL to new wallets
 for recipient in RECIPIENTS:
     print(f"Sending {SOL_PER_RECIPIENT} SOL to {recipient}...")
-    command = f"solana transfer --keypair tokens/keys/{kname}-keypair.json --to {recipient} {SOL_PER_RECIPIENT}"
+    command = f"solana transfer {recipient} {SOL_PER_RECIPIENT} --keypair tokens/keys/{kname}-keypair.json --allow-unfunded-recipient"
+    result = run_command(command)
+    print(result)
     time.sleep(1)  # Short delay to avoid rate limits
 
 with open(f"tokens/wallets/{kname}_wallets.json", 'w') as f:

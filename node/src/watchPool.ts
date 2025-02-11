@@ -1,4 +1,7 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PublicKey, Keypair } from "@solana/web3.js";
+import { getAssociatedTokenAddress } from "@solana/spl-token";
 import {
   LIQUIDITY_STATE_LAYOUT_V4,
   getMultipleAccountsInfo,
@@ -19,6 +22,8 @@ import {
 } from "./lib/util";
 import { connection, makeTxVersion } from "./config";
 import { exec } from "child_process";
+import { ammFetchPoolId } from "./fetchPool";
+import axios from "axios";
 
 // --- CONFIGURATION ---
 const configFilePath = process.argv[2];
@@ -26,7 +31,7 @@ if (!configFilePath) {
   throw new Error("Config file path must be provided as a runtime argument.");
 }
 const config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
-const kname = config.mode + "_" + config.metadata.symbol;
+const kname = config.mode + "_" + config.metaData.symbol;
 
 const pool_wallet_file = "../tokens/keys/" + kname + "-keypair.json";
 const POOL_WALLET_SECRET = JSON.parse(
@@ -42,72 +47,40 @@ const storageWallet = Keypair.fromSecretKey(
   new Uint8Array(STORAGE_WALLET_SECRET)
 );
 
-const TOKEN_PAIR = config.TOKEN_PAIR;
 const TARGET_BALANCE = parseFloat(config.TARGET_BALANCE);
 const WITHDRAW_AMOUNT = parseFloat(config.WITHDRAW_AMOUNT);
 
-async function getLiquidityPool(tokenPair: string): Promise<PublicKey | null> {
-  console.log(`Fetching liquidity pool for ${tokenPair}...`);
-  const response = await fetch(
-    config.mode == "PROD"
-      ? "https://api.raydium.io/v2/sdk/liquidity/mainnet.json"
-      : "https://api.raydium.io/v2/sdk/liquidity/devnet.json"
-  );
-  const pools = await response.json();
+async function getPool() {
+  const marketId = config.tokenData.targetMarketId;
+  const pool = await ammFetchPoolId({
+    marketId,
+  });
+  const account = await connection.getAccountInfo(new PublicKey(pool.id));
+  if (account === null) throw Error(" get id info error ");
+  const info = LIQUIDITY_STATE_LAYOUT_V4.decode(account.data);
 
-  for (const pool of pools) {
-    if (pool.name === tokenPair) {
-      console.log(`✅ Found Pool: ${pool.name} | Address: ${pool.lpMint}`);
-      return new PublicKey(pool.lpMint);
-    }
-  }
-
-  console.error("❌ Pool not found!");
-  return null;
+  return { pool: info, poolId: new PublicKey(pool.id) };
 }
 
 // --- FETCH TOTAL POOL BALANCE ---
-async function getPoolBalance(lpMint: PublicKey): Promise<TokenAmount> {
-  const accountInfo = await connection.getAccountInfo(lpMint);
-  if (!accountInfo) {
-    throw new Error("Failed to fetch pool account info.");
-  }
-
-  const poolState = LIQUIDITY_STATE_LAYOUT_V4.decode(accountInfo.data);
-
+async function getPoolBalance(poolState: any) {
   const baseTokenAmount = await connection.getTokenAccountBalance(
-    poolState.baseVault
+    new PublicKey(poolState.baseVault)
   );
   const quoteTokenAmount = await connection.getTokenAccountBalance(
-    poolState.quoteVault
+    new PublicKey(poolState.quoteVault)
   );
 
-  const denominator = new BN(10).pow(poolState.baseDecimal);
+  const denominator = new BN(10).pow(new BN(poolState.baseDecimal));
 
-  console.log(
-    "pool info:",
-    "base vault balance " + baseTokenAmount.value.uiAmount,
-    "quote vault balance " + quoteTokenAmount.value.uiAmount,
-
-    "base token decimals " + poolState.baseDecimal.toNumber(),
-    "quote token decimals " + poolState.quoteDecimal.toNumber(),
-    "total lp " + poolState.lpReserve.div(denominator).toString()
-  );
-
-  return poolState.lpReserve.div(denominator).toString(); // 9 decimals for SOL
+  return {
+    baseBalance: baseTokenAmount.value.uiAmount,
+    quoteBalance: quoteTokenAmount.value.uiAmount,
+    totallp: poolState.lpReserve.div(denominator).toString(),
+  };
 }
 
 // --- FETCH USER POOL BALANCE ---
-async function getUserPoolBalance(
-  userWallet: PublicKey,
-  lpMint: PublicKey
-): Promise<number> {
-  const accounts = await getMultipleAccountsInfo(connection, [userWallet]);
-  if (!accounts[0]) return 0;
-
-  const balance = await connection.getTokenAccountBalance(lpMint);
-  return parseFloat(balance.value.amount);
-}
 
 // --- WITHDRAW LP TOKENS ---
 type WalletTokenAccounts = Awaited<ReturnType<typeof getWalletTokenAccount>>;
@@ -163,12 +136,12 @@ async function withdrawFromPool(
   );
   const removeLpTokenAmount = new TokenAmount(lpToken, 100);
   // TODO: Add Raydium withdraw instruction here
-  ammRemoveLiquidity({
+  /*ammRemoveLiquidity({
     removeLpTokenAmount,
     targetPool: lpMint.toString(),
     walletTokenAccounts: accounts,
     wallet: poolWallet,
-  });
+  });*/
 
   console.log(`✅ Successfully withdrew ${amount} LP tokens.`);
 }
@@ -198,29 +171,92 @@ async function transferToStorage(
   console.log(`✅ Successfully transferred ${amount} SOL to storage wallet.`);
 }
 
-// --- MONITOR & EXECUTE WITHDRAWAL ---
-async function monitorAndWithdraw() {
-  const lpMint = await getLiquidityPool(TOKEN_PAIR);
-  if (!lpMint) return;
+async function getSolAudPrice() {
+  try {
+    const response = await axios.get(
+      "https://api.btcmarkets.net/v3/markets/SOL-AUD/ticker"
+    );
+    return response.data.lastPrice;
+  } catch (error) {
+    console.error("Error fetching SOL-AUD price:", error);
+    return null;
+  }
+}
 
-  const totalPool = await getPoolBalance(lpMint);
-  const userPoolBalance = await getUserPoolBalance(
-    poolWallet.publicKey,
-    lpMint
+// --- MONITOR & EXECUTE WITHDRAWAL ---
+async function monitor() {
+  console.clear();
+  const { pool, poolId } = await getPool();
+
+  const totalPool = await getPoolBalance(pool);
+
+  console.log(`📊 Total Pool: ${totalPool.totallp} LP`);
+
+  const acc = await connection.getMultipleAccountsInfo([poolId]);
+  const parsed = acc.map((v) => LIQUIDITY_STATE_LAYOUT_V4.decode(v.data));
+  const lpMint = parsed[0].lpMint;
+  let lpReserve = parsed[0].lpReserve.toNumber();
+
+  const accInfo = await connection.getParsedAccountInfo(new PublicKey(lpMint));
+  //@ts-ignore
+  const mintInfo = accInfo?.value?.data?.parsed?.info;
+
+  lpReserve = lpReserve / Math.pow(10, mintInfo?.decimals);
+  const actualSupply = mintInfo?.supply / Math.pow(10, mintInfo?.decimals);
+  console.log(
+    `🪙  lpMint - Reserve: ${lpReserve}, Actual Supply: ${actualSupply}`
   );
 
-  console.log(`📊 Total Pool: ${totalPool.toFixed(2)} LP`);
-  console.log(`👤 Your Pool Balance: ${userPoolBalance.toFixed(2)} LP`);
+  //Calculate burn percentage
+  const maxLpSupply = Math.max(actualSupply, lpReserve - 1);
+  const burnAmt = lpReserve - actualSupply;
+  console.log(`🔥 burn amt: ${burnAmt}`);
+  const burnPct = (burnAmt / lpReserve) * 100;
+  console.log(`🔥 ${burnPct} LP burned`);
 
-  const percentage = (userPoolBalance / Number(totalPool.toExact())) * 100;
+  const lpTokenAccount = await getAssociatedTokenAddress(
+    pool.lpMint,
+    poolWallet.publicKey,
+    true
+  );
 
-  console.log(`📈 Current Ownership: ${percentage.toFixed(2)}%`);
+  // Check if this account exists
+  //const accountInfo = await connection.getAccountInfo(lpTokenAccount);
+  //if (accountInfo) {
+  const balance = await connection.getTokenAccountBalance(lpTokenAccount);
+  console.log(`👤 My Pool Balance: ${balance.value.uiAmount} LP`);
 
-  if (userPoolBalance >= TARGET_BALANCE) {
+  const percentage = (balance.value.uiAmount / Number(totalPool.totallp)) * 100;
+
+  console.log(`📈 Ownership: ${percentage.toFixed(2)}%`);
+
+  const solAudPrice = await getSolAudPrice();
+
+  const price =
+    totalPool.baseBalance /
+    10 ** config.decimals /
+    (totalPool.quoteBalance / 10 ** 9);
+  console.log(
+    "🪙  Pool " + config.metaData.symbol + " balance " + totalPool.baseBalance
+  );
+  console.log("🪙  Pool SOL balance " + totalPool.quoteBalance);
+  console.log(`🪙  ${config.metaData.symbol}-SOL: ${price}`);
+  console.log(`🪙  ${config.metaData.symbol}-AUD: ${price / solAudPrice}`);
+  console.log(`💵 SOL-AUD: $${solAudPrice}`);
+  console.log(`💵 POOL SOL as AUD: $${solAudPrice * totalPool.quoteBalance}`);
+  console.log(
+    `💵 SHARE POOL SOL as AUD: $${(
+      solAudPrice *
+      ((totalPool.quoteBalance / 100) * percentage)
+    ).toFixed(2)}`
+  );
+  const cando = false;
+
+  if (balance.value.uiAmount >= TARGET_BALANCE && cando) {
     console.log(
       `🎯 Target reached! Withdrawing ${WITHDRAW_AMOUNT} LP tokens...`
     );
-    await withdrawFromPool(poolWallet, lpMint, WITHDRAW_AMOUNT);
+    await withdrawFromPool(poolWallet, poolId, WITHDRAW_AMOUNT);
     console.log(`😴 Sleeping for 1 minute...`);
     await new Promise((resolve) => setTimeout(resolve, 60000));
     console.log(`💰 Withdrawing funds to storage wallet...`);
@@ -230,9 +266,10 @@ async function monitorAndWithdraw() {
       WITHDRAW_AMOUNT
     );
   } else {
-    console.log(`⏳ Waiting... Your pool amount is below target.`);
+    // console.log(`⏳ Waiting... Your pool amount is below target.`);
   }
+  setTimeout(monitor, 60000);
 }
 
 // --- RUN SCRIPT ---
-setInterval(monitorAndWithdraw, 60000); // Check every 60 seconds
+monitor();

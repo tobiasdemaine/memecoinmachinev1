@@ -6,18 +6,16 @@ import {
   buildSimpleTransaction,
 } from "@raydium-io/raydium-sdk";
 
-import { Keypair, VersionedTransaction } from "@solana/web3.js";
+import { VersionedTransaction } from "@solana/web3.js";
 
-import bs58 from "bs58";
+//import bs58 from "bs58";
 
-import { connection, makeTxVersion, addLookupTableInfo } from "../config.js";
+import { connection, makeTxVersion, addLookupTableInfo } from "../config";
 
-import { getWalletTokenAccount, formatAmmKeysById, sleepTime } from "./util.js";
+import { getWalletTokenAccount, formatAmmKeysById, sleepTime } from "./util";
 
 async function execSwap(input) {
-  const myKeyPair = Keypair.fromSecretKey(
-    new Uint8Array(bs58.decode(input.wallet))
-  );
+  const myKeyPair = input.wallet;
   const myPublicKey = myKeyPair.publicKey;
 
   // -------- pre-action: get pool info --------

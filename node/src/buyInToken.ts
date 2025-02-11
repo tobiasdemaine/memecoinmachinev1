@@ -6,9 +6,9 @@ import {
   TOKEN_PROGRAM_ID,
   TokenAmount,
 } from "@raydium-io/raydium-sdk";
-import * as bs58 from "bs58";
 import { DEFAULT_TOKEN } from "./config";
 import { Keypair, PublicKey } from "@solana/web3.js";
+import BN from "bn.js";
 
 const main = async () => {
   const configPath = process.argv[2];
@@ -23,24 +23,28 @@ const main = async () => {
     config.tokenData.symbol,
     config.tokenData.tokenName
   );
+  const RENT = 0;
+  const amount = new BN(
+    (config.wallets.BASE_AMOUNT / config.wallets.NUM_RECIPIENTS - RENT) *
+      10 ** 9
+  );
 
   const quoteToken = DEFAULT_TOKEN.WSOL;
   const outputToken = baseToken;
-  const inputTokenAmount = new TokenAmount(quoteToken, config.tokenData.amount);
-  const walletSecret = process.argv[3];
+  const inputTokenAmount = new TokenAmount(quoteToken, amount);
+  const walletPath = process.argv[3];
   const slippage = new Percent(1, 100);
-  const wallet = Keypair.fromSecretKey(
-    new Uint8Array(bs58.decode(walletSecret))
-  );
+  const WALLET_SECRET = JSON.parse(fs.readFileSync(walletPath, "utf8"));
 
-  const res = await execSwap({
-    targetPool: config.tokenData.targetPool,
+  const wallet = Keypair.fromSecretKey(new Uint8Array(WALLET_SECRET));
+
+  await execSwap({
+    targetPool: config.tokenData.poolMintAccount,
     inputTokenAmount,
     outputToken,
     slippage,
     wallet,
   });
-  console.log(res);
 };
 
 main();

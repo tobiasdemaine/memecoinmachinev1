@@ -6,6 +6,8 @@ import {
   TxVersion,
   TOKEN_PROGRAM_ID,
   LOOKUP_TABLE_CACHE,
+  DEVNET_PROGRAM_ID,
+  MAINNET_PROGRAM_ID,
 } from "@raydium-io/raydium-sdk";
 
 const makeTxVersion = TxVersion.V0;
@@ -14,7 +16,8 @@ const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 const connection = new Connection(
   config.mode == "PROD" ? config.RPC_MAIN : config.RPC_DEV
 ); // helius
-
+const PROGRAM_ID =
+  config.mode == "PROD" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
 const kname = config.mode + "_" + config.metaData.symbol;
 const POOL_WALLET_SECRET = JSON.parse(
   fs.readFileSync("../tokens/keys/" + kname + "-keypair.json", "utf8")
@@ -74,4 +77,5 @@ export {
   addLookupTableInfo,
   CONFIG_PROGRAM_ID,
   DEFAULT_TOKEN,
+  PROGRAM_ID,
 };

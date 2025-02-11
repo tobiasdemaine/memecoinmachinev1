@@ -13,7 +13,7 @@ def run_command(command):
 def main():
      # Load configuration from JSON file
     if len(sys.argv) < 2:
-        print("Usage: python createToken2.py <config_file>")
+        print("Usage: python createToken.py <config_file>")
         exit(1)
     json_file_path = sys.argv[1]
     with open(json_file_path, 'r') as f:

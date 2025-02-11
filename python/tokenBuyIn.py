@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 import sys
 import time
 
@@ -14,7 +15,7 @@ with open(json_file_path, 'r') as f:
 
 TOKEN_MINT = config["tokenData"]["mintAccount"] # The token you want to swap into (Example: RAY token mint address)
 kname = config["mode"] + "_" + config['metaData']['symbol']
-WALLETS_FILE = "../tokens/wallets/{kname}_wallets.json"
+WALLETS_FILE = f"./tokens/wallets/{kname}_wallets.json"
 
 # Ensure wallet file exists
 if not os.path.isfile(WALLETS_FILE):
@@ -29,20 +30,19 @@ SWAP_AMOUNT = float(config["wallets"]["BASE_AMOUNT"]) / int(config["wallets"]["N
 #cli =True
 # Loop through wallets and swap all SOL for the specified token
 with open(WALLETS_FILE, 'r') as file:
-    for line in file:
-        wallet_address, wallet_file = line.strip().split("->")
+    wallets = json.load(file)
+
+    for wallet_address, wallet_file in wallets.items():
         print(f"Using wallet: {wallet_address} ({wallet_file})")
         # Load the wallet keypair
-        with open("./tokens/wallets/"+wallet_file, 'r') as wf:
-            secret_key = wf.read().strip().encode('utf-8')
-        #wallet = Keypair.from_secret_key(secret_key)
-
+        
         # Construct the command to run the TypeScript script
-        command = f"cd ./node && ts-node ./src/buyInToken.ts ../{json_file_path} {secret_key}"
-
+        command = f"cd node && npx ts-node ./src/buyInToken.ts ../{json_file_path} ../{wallet_file}"
+        print(command)
         # Execute the command
+        #result = subprocess.run(command, shell=True, capture_output=True, text=True)
         result = os.system(command)
-
+        print(result)
         # Check if the command was successful
         if result != 0:
             print(f"Failed to execute buy-in for wallet: {wallet_address}")
