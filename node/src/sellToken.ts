@@ -23,14 +23,11 @@ const main = async () => {
     config.tokenData.symbol,
     config.tokenData.tokenName
   );
-  const RENT = 0.0025;
-  const amount = new BN(
-    (config.wallets.BASE_AMOUNT / config.wallets.NUM_RECIPIENTS - RENT) *
-      10 ** 9
-  );
 
-  const quoteToken = DEFAULT_TOKEN.WSOL;
-  const outputToken = baseToken;
+  const amount = new BN(Number(process.argv[4]) * 10 ** config.decimals);
+
+  const outputToken = DEFAULT_TOKEN.WSOL;
+  const quoteToken = baseToken;
   const inputTokenAmount = new TokenAmount(quoteToken, amount);
   const walletPath = process.argv[3];
   const slippage = new Percent(1, 100);

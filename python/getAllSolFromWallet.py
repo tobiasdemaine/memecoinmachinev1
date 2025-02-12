@@ -35,14 +35,24 @@ def get_rent_exempt_balance():
 def transfer_sol(sender_wallet, recipient_wallet, amount):
     """Transfer the calculated SOL amount from sender to recipient."""
     print(f"\nTransferring {amount:.6f} SOL from {sender_wallet} to {recipient_wallet}...")
-    confirmation = input("Are you sure? (y/n): ").strip().lower()
-    if confirmation != 'y':
-        print("Transfer cancelled.")
-        sys.exit(0)
-
-    transfer_cmd = f"solana transfer --allow-unfunded-recipient --keypair {sender_wallet} {recipient_wallet} {amount} --fee-payer {sender_wallet}"
+    #confirmation = input("Are you sure? (y/n): ").strip().lower()
+    #if confirmation != 'y':
+    #    print("Transfer cancelled.")
+    #    sys.exit(0)
+    transfer_cmd = f"solana transfer {recipient_wallet} {amount} --keypair {sender_wallet} --allow-unfunded-recipient"
+    #transfer_cmd = f"solana transfer --allow-unfunded-recipient --keypair {sender_wallet} {recipient_wallet} {amount} --fee-payer {sender_wallet}"
     run_command(transfer_cmd)
     print(f"✅ Successfully transferred {amount:.6f} SOL to {recipient_wallet}.")
+
+def getAllSolFromWallet(sender_wallet, recipient_wallet):
+    balance = get_balance(sender_wallet)
+    rent_exempt_balance = get_rent_exempt_balance()
+
+    amount_to_send = balance - rent_exempt_balance
+    if amount_to_send <= 0:
+        print("❌ Insufficient funds to transfer after leaving the rent-exempt balance.")
+    else:
+        transfer_sol(sender_wallet, recipient_wallet, amount_to_send)
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
