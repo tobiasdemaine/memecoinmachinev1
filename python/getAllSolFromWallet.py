@@ -1,5 +1,8 @@
+import json
 import subprocess
 import sys
+
+from tokenFarming.python.audit import auditWalletAccount
 
 def run_command(command):
     """Run a shell command and return its output as a string."""
@@ -18,6 +21,11 @@ def get_sender_wallet():
         if "Keypair Path" in line:
             return line.split(":")[1].strip()
     return None
+
+def get_public_key(walletpath):
+    """Fetch the public key from the specified wallet path file."""
+    public_key_output = run_command(f"solana-keygen pubkey {walletpath}")
+    return public_key_output.strip()
 
 def get_balance(wallet):
     """Fetch the SOL balance of the specified wallet."""
@@ -55,18 +63,25 @@ def getAllSolFromWallet(sender_wallet, recipient_wallet):
         transfer_sol(sender_wallet, recipient_wallet, amount_to_send)
 
 if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python transfer_sol.py <recipient_wallet_address> <from_keypair>")
+    if len(sys.argv) < 4:
+        print("Usage: python transfer_sol.py <recipient_wallet_address> <from_keypair> >config_path>")
         sys.exit(1)
-
+    json_file_path = sys.argv[1]
+    with open(json_file_path, 'r') as f:
+        config = json.load(f)
     recipient_wallet = sys.argv[1]
     sender_wallet = sys.argv[2]
+
     balance = get_balance(sender_wallet)
     rent_exempt_balance = get_rent_exempt_balance()
-
+    sender_wallet
     amount_to_send = balance - rent_exempt_balance
     if amount_to_send <= 0:
         print("❌ Insufficient funds to transfer after leaving the rent-exempt balance.")
         sys.exit(1)
-
+    pk = get_public_key(sender_wallet)
+    auditWalletAccount(pk, sender_wallet, "PRE TRANSFER ALL SOL FROM WALLET", f"sol: {amount_to_send}", config)
+    auditWalletAccount(recipient_wallet, "", "PRE RECEIVE ALL SOL FROM WALLET", f"sol: {amount_to_send}", config)
     transfer_sol(sender_wallet, recipient_wallet, amount_to_send)
+    auditWalletAccount(pk, sender_wallet, "POST TRANSFER ALL SOL FROM WALLET", f"sol: {amount_to_send}", config)
+    auditWalletAccount(recipient_wallet, "", "POST RECEIVE ALL SOL FROM WALLET", f"sol: {amount_to_send}", config)

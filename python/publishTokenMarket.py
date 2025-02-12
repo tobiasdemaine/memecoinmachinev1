@@ -2,6 +2,8 @@ import sys
 import json
 import subprocess
 
+from tokenFarming.python.audit import auditTokenBaseAccount
+
 def publishTokenMarket(json_file):
     
 
@@ -12,7 +14,7 @@ def publishTokenMarket(json_file):
     except Exception as e:
         print(f"Error reading JSON file: {e}")
         sys.exit(1)
-
+    auditTokenBaseAccount("PRE CREATE MARKET", "", args)
     try:
         subprocess.run(["cd", "../node"], check=True, shell=True)
     except subprocess.CalledProcessError as e:
@@ -26,6 +28,7 @@ def publishTokenMarket(json_file):
     except subprocess.CalledProcessError as e:
         print(f"Error running command: {e.stderr}")
         sys.exit(1)
+    auditTokenBaseAccount("POST CREATE MARKET", "", args)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

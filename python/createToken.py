@@ -2,6 +2,8 @@ import subprocess
 import json
 import sys
 
+from tokenFarming.python.audit import auditBaseAccount, auditTokenBaseAccount
+
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
@@ -21,6 +23,7 @@ def main():
 
     kname = config["mode"] + "_" + config['metaData']['symbol']
     sol_amount = config["SOL_AMOUNT"]
+    
     # Generate a keypair for the token mint
     print("Generating token mint keypair...")
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-keypair.json --force --no-passphrase")
@@ -29,12 +32,18 @@ def main():
     print(f"Token mint authority: {mint_authority}")
 
     if config["mode"] == "DEV":
+        auditTokenBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url devnet")
-        run_command(f"solana airdrop 0.5 {mint_authority}")
+        run_command(f"solana airdrop 5 {mint_authority}")
+        auditTokenBaseAccount("CREATE TOKEN SOL AIRDROP", "airdropped sol: 5", config)
     if config["mode"] == "PROD":
+        auditBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url mainnet")
         run_command(f"solana transfer --keypair ./tokens/keys/base-keypair.json --to {mint_authority} {sol_amount}")
+        auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
+        auditTokenBaseAccount("CREATE TOKEN SOL RECEIVE", "recieve sol: {sol_amount}", config)
 
+    
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --no-passphrase")
    
     mint_account = run_command(f"solana-keygen pubkey tokens/keys/{kname}-mintaccount-keypair.json")
@@ -60,7 +69,7 @@ def main():
     initial_supply = config['initialSupply']
     print(f"Minting {initial_supply} tokens to token account...")
     run_command(f"spl-token mint {mint_account} {initial_supply} {token_account}")
-
+    auditTokenBaseAccount("CREATE TOKEN RECEIVE MINT", "recieve MINT: {token_account}", config)
    
     metadata = {
         "name": config['metaData']['name'],

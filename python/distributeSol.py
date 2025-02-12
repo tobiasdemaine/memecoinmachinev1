@@ -4,6 +4,8 @@ import time
 import json
 import sys
 
+from tokenFarming.python.audit import auditAllWalletAccounts
+
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
@@ -40,7 +42,7 @@ for i in range(1, NUM_RECIPIENTS + 1):
     wallets[f"{wallet_address}"] = f"tokens/wallets/{kname}_wallet_{i}.json"
    
     print(f"Generated wallet #{i}: {wallet_address}")
-
+auditAllWalletAccounts("PRE DISTRIBUTE SOL TO TRADING ACCOUNTS", "", config)
 
 # Distribute SOL to new wallets
 for recipient in RECIPIENTS:
@@ -53,5 +55,6 @@ for recipient in RECIPIENTS:
 with open(f"tokens/wallets/{kname}_wallets.json", 'w') as f:
     json.dump(wallets, f, indent=4)
 
+auditAllWalletAccounts("POST DISTRIBUTE SOL TO TRADING ACCOUNTS", "", config)
 print("Wallet generation and SOL distribution complete!")
 print(f"Wallets saved in tokens/wallets/{kname}_wallets.json")

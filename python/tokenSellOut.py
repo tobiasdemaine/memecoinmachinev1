@@ -4,6 +4,8 @@ import subprocess
 import sys
 import time
 
+from tokenFarming.python.audit import auditAllWalletAccounts
+
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
@@ -34,7 +36,7 @@ if not os.path.isfile(WALLETS_FILE):
 network = "mainnet"
 if(config["mode"] == "DEV"):
     network = "devnet"
-
+auditAllWalletAccounts("PRE TOKEN SELL OUT FROM TRADING ACCOUNTS", "", config)
 # Loop through wallets and swap all SOL for the specified token
 with open(WALLETS_FILE, 'r') as file:
     wallets = json.load(file)
@@ -55,5 +57,6 @@ with open(WALLETS_FILE, 'r') as file:
         print(result)
         
         print("-")
+auditAllWalletAccounts("PRE TOKEN SELL OUT FROM TRADING ACCOUNTS", "", config)
         
  

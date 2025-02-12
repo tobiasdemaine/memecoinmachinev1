@@ -4,6 +4,8 @@ import subprocess
 import sys
 import time
 
+from tokenFarming.python.audit import auditAllWalletAccounts
+
 # Check for required arguments
 if len(sys.argv) < 2:
     print("Usage: python token_buy_in.py <jsonfile> ")
@@ -29,6 +31,7 @@ if(config["mode"] == "DEV"):
 SWAP_AMOUNT = float(config["wallets"]["BASE_AMOUNT"]) / int(config["wallets"]["NUM_RECIPIENTS"]) # The amount of SOL to swap for the token
 #cli =True
 # Loop through wallets and swap all SOL for the specified token
+auditAllWalletAccounts("PRE TOKEN BUY IN FROM TRADING ACCOUNTS", "", config)
 with open(WALLETS_FILE, 'r') as file:
     wallets = json.load(file)
 
@@ -50,5 +53,5 @@ with open(WALLETS_FILE, 'r') as file:
             print(f"Successfully executed buy-in for wallet: {wallet_address}")
         print("snoozing for 1 second")
         time.sleep(1)
-
+auditAllWalletAccounts("POST TOKEN BUY IN FROM TRADING ACCOUNTS", "", config)
 print("Token buy-in process complete!")
