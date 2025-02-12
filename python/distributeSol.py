@@ -30,10 +30,12 @@ kname = config["mode"] + "_" + config['metaData']['symbol']
 print(f"Generating {NUM_RECIPIENTS} wallets...")
 RECIPIENTS = []
 wallets = {}
-
+mint_account = config["tokenData"]["mintAccount"]
 for i in range(1, NUM_RECIPIENTS + 1):
     command = run_command(f"solana-keygen new --outfile tokens/wallets/{kname}_wallet_{i}.json --force --no-passphrase")
     wallet_address = run_command(f"solana-keygen pubkey tokens/wallets/{kname}_wallet_{i}.json")
+    token_account = run_command(f"spl-token create-account --fee-payer tokens/keys/{kname}-keypair.json --owner {wallet_address} {mint_account}")
+    wsol_account = run_command(f"spl-token create-account --fee-payer tokens/keys/{kname}-keypair.json --owner {wallet_address} So11111111111111111111111111111111111111112")
     RECIPIENTS.append(wallet_address)
     wallets[f"{wallet_address}"] = f"tokens/wallets/{kname}_wallet_{i}.json"
    

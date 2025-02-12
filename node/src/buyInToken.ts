@@ -23,7 +23,7 @@ const main = async () => {
     config.tokenData.symbol,
     config.tokenData.tokenName
   );
-  const RENT = 0;
+  const RENT = 0.0025;
   const amount = new BN(
     (config.wallets.BASE_AMOUNT / config.wallets.NUM_RECIPIENTS - RENT) *
       10 ** 9

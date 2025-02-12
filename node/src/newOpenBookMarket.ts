@@ -1,134 +1,217 @@
-import { Connection, PublicKey } from "@solana/web3.js";
-import * as fs from "fs";
 import {
-  OpenBookDex,
-  createOpenBookMarket,
-  MarketParams,
-} from "@openbook-dex/openbook";
-import { Market, OpenOrders } from '@project-serum/serum';
-import { DEFAULT_TOKEN, myKeyPair } from "./config";
-import { DEVNET_PROGRAM_ID, MAINNET_PROGRAM_ID } from "@raydium-io/raydium-sdk";
-import { MarketOptions } from "@project-serum/serum/lib/market";
-///import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
+  Keypair,
+  PublicKey,
+  SystemProgram,
+  Transaction,
+  Connection,
+  sendAndConfirmTransaction,
+} from "@solana/web3.js";
+import { AnchorProvider, BN, Wallet } from "@coral-xyz/anchor";
 
-// Replace these with your actual keypairs and public keys
-const payerKeypair = myKeyPair; // This should be your wallet keypair
-const connection = new Connection("devnet"); // Use 'mainnet-beta' for production
-const configPath = process.argv[2];
-if (!configPath) {
-  throw new Error("Config file path must be provided as the first argument");
-}
-const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
+import { OpenBookV2Client } from "@openbook-dex/openbook-v2";
+import {
+  DEFAULT_TOKEN,
+  RPC,
+  authority,
+  config,
+  connection,
+  programId,
+} from "./lib/obUtils";
+//import { MintUtils } from "./mint_utils";
 
-const RAYDIUM_PROGRAM_ID =
-    config.mode == "PROD" ? MAINNET_PROGRAM_ID : DEVNET_PROGRAM_ID;
+export async function createAccount(
+  connection: Connection,
+  authority: Keypair,
+  size: number,
+  owner: PublicKey
+): Promise<PublicKey> {
+  const lamports = await connection.getMinimumBalanceForRentExemption(size);
+  const address = Keypair.generate();
 
-const serumProgramId = new PublicKey('...'); 
+  const transaction = new Transaction().add(
+    SystemProgram.createAccount({
+      fromPubkey: authority.publicKey,
+      newAccountPubkey: address.publicKey,
+      lamports,
+      space: size,
+      programId: owner,
+    })
+  );
 
-async function createOpenbookMarket() {
-  const mo : MarketOptions = {
-
-  }
-  const options = {
-    // Base mint address
-    baseMint: new PublicKey(config.tokenData.mintAccount),
-    // Quote mint address
-    quoteMint: DEFAULT_TOKEN.WSOL.programId,
-    // The lot size of the base token
-    baseLotSize: config.tokenData.lotSize,
-    // The lot size of the quote token
-    quoteLotSize: config.tokenData.lotSize,
-    // Market maker can only make orders at this tick size
-    tickSize: config.tokenData.tickSize,
-    // If true, the market will be a spot market, otherwise it's a perpetual market
-    isSpot: true,
-    // Authority to manage the market
-    marketAuthority: payerKeypair.publicKey,
-    // Optional, if you want a specific market name
-    name: config.tokenData.symbol + "-" + DEFAULT_TOKEN.WSOL.symbol,
-    eventQueueLength: config.tokenData.eventQueueLength, // Number of events the queue can hold
-    requestQueueLength: config.tokenData.requestQueueLength, // Number of requests the queue can hold
-    bidsSize: config.tokenData.bidsSize, // Size of the bids orderbook, in bytes
-    asksSize: config.tokenData.asksSize, // Size of the asks orderbook, in bytes
-  };
-    const market = await Market.
-
-   await market.initialize(connection, payerKeypair, { 
-
-        // ... necessary parameters for initialization
-
-    });
-
-
-
-    // Return the market address
-
-    return market.address;
-
+  transaction.feePayer = authority.publicKey;
+  const hash = await connection.getRecentBlockhash();
+  transaction.recentBlockhash = hash.blockhash;
+  // Sign transaction, broadcast, and confirm
+  await sendAndConfirmTransaction(
+    connection,
+    transaction,
+    [authority, address],
+    { commitment: "confirmed" }
+  );
+  return address.publicKey;
 }
 
-
-
-// Example usage:
-
-
-
-
-async function createMarket() {
-  const openBookDex = new OpenBookDex(connection, payerKeypair);
-
-  // Define market parameters
-  const marketParams: MarketParams = {
-    // Base mint address
-    baseMint: new PublicKey(config.tokenData.mintAccount),
-    // Quote mint address
-    quoteMint: DEFAULT_TOKEN.WSOL.programId,
-    // The lot size of the base token
-    baseLotSize: config.tokenData.lotSize,
-    // The lot size of the quote token
-    quoteLotSize: config.tokenData.lotSize,
-    // Market maker can only make orders at this tick size
-    tickSize: config.tokenData.tickSize,
-    // If true, the market will be a spot market, otherwise it's a perpetual market
-    isSpot: true,
-    // Authority to manage the market
-    marketAuthority: payerKeypair.publicKey,
-    // Optional, if you want a specific market name
-    name: config.tokenData.symbol + "-" + DEFAULT_TOKEN.WSOL.symbol,
-    eventQueueLength: config.tokenData.eventQueueLength, // Number of events the queue can hold
-    requestQueueLength: config.tokenData.requestQueueLength, // Number of requests the queue can hold
-    bidsSize: config.tokenData.bidsSize, // Size of the bids orderbook, in bytes
-    asksSize: config.tokenData.asksSize, // Size of the asks orderbook, in bytes
-  };
-
-  try {
-    const market = await createOpenBookMarket(
-      connection,
-      payerKeypair,
-      marketParams
-    );
-    console.log("Market created successfully:", market.address.toBase58());
-    config.tokenData.targetMarketId = market.address.toBase58();
-
-    config.tokenData.market = {
-      RequestQueue: market.requestQueue.toBase58(),
-      EventQueue: market.eventQueue.toBase58(),
-      Bids: market.bids.toBase58(),
-      Asks: market.asks.toBase58(),
-      BaseVault: market.baseVault.toBase58(),
-      QuoteVault: market.quoteVault.toBase58(),
-    };
-    fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-    // You might want to save these addresses for future reference
-    console.log("Request Queue:", market.requestQueue.toBase58());
-    console.log("Event Queue:", market.eventQueue.toBase58());
-    console.log("Bids:", market.bids.toBase58());
-    console.log("Asks:", market.asks.toBase58());
-    console.log("Base Vault:", market.baseVault.toBase58());
-    console.log("Quote Vault:", market.quoteVault.toBase58());
-  } catch (error) {
-    console.error("Failed to create market:", error);
-  }
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-createMarket();
+async function main() {
+  const wallet = new Wallet(authority);
+  const provider = new AnchorProvider(new Connection(RPC), wallet, {
+    commitment: "confirmed",
+  });
+  const client = new OpenBookV2Client(provider, programId);
+
+  console.log(
+    "starting with balance: ",
+    await provider.connection.getBalance(authority.publicKey)
+  );
+
+  // const nbMints = 2;
+  //let mintUtils = new MintUtils(provider.connection, authority);
+  // let mints = await mintUtils.createMints(nbMints);
+  // console.log("Mints created");
+  // console.log("Mint 0", mints[0].toString());
+  // console.log("Mint 1", mints[1].toString());
+  // await delay(300);
+  // const baseMint = mints[1];
+  // const quoteMint = mints[0];
+
+  // In devent
+  // const baseMint = new PublicKey("DEPipWZkmZcr1sL6pVwj8amRjr9kw91UkFR7tvqdvMy2");
+  // const quoteMint = new PublicKey("BfvE9DViu6SkSMBz4TYVftd5DNp7bafemMujXBdVwFYN");
+
+  // Mainnet acounts for SOL-USDC
+  // WSOL
+  const baseMint = new PublicKey(config.tokenData.mintAccount);
+  // USDC
+  const quoteMint = DEFAULT_TOKEN.WSOL.programId;
+
+  // // Sol/USD
+  // const oracleAId = new PublicKey(
+  //   "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG"
+  // );
+  // // USDC/USD
+  // const oracleBId = new PublicKey(
+  //   "Gnt27xtC473ZT2Mw5u8wZ68Z3gULkSTb5DuxJy7eJotD"
+  // );
+  const oracleAId = null;
+  const oracleBId = null;
+
+  // let [oracleAId, _tmp1] = PublicKey.findProgramAddressSync(
+  //   [
+  //     Buffer.from("StubOracle"),
+  //     adminKp.publicKey.toBytes(),
+  //     baseMint.toBytes(),
+  //   ],
+  //   programId
+  // );
+
+  // let [oracleBId, _tmp3] = PublicKey.findProgramAddressSync(
+  //   [
+  //     Buffer.from("StubOracle"),
+  //     adminKp.publicKey.toBytes(),
+  //     quoteMint.toBytes(),
+  //   ],
+  //   programId
+  // );
+
+  // let price = getRandomInt(1000);
+
+  // if ((await anchorProvider.connection.getAccountInfo(oracleAId)) == null) {
+  //   await program.methods
+  //     .stubOracleCreate({ val: new BN(1) })
+  //     .accounts({
+  //       payer: adminKp.publicKey,
+  //       oracle: oracleAId,
+  //       mint: baseMint,
+  //       systemProgram: SystemProgram.programId,
+  //     })
+  //     .signers([adminKp])
+  //     .rpc();
+  // }
+  // if ((await anchorProvider.connection.getAccountInfo(oracleBId)) == null) {
+  //   await program.methods
+  //     .stubOracleCreate({ val: new BN(1) })
+  //     .accounts({
+  //       payer: adminKp.publicKey,
+  //       oracle: oracleBId,
+  //       mint: quoteMint,
+  //       systemProgram: SystemProgram.programId,
+  //     })
+  //     .signers([adminKp])
+  //     .rpc();
+  // }
+
+  // await program.methods
+  //   .stubOracleSet({
+  //     val: new BN(price),
+  //   })
+  //   .accounts({
+  //     owner: adminKp.publicKey,
+  //     oracle: oracleAId,
+  //   })
+  //   .signers([adminKp])
+  //   .rpc();
+
+  // await program.methods
+  //   .stubOracleSet({
+  //     val: new BN(price),
+  //   })
+  //   .accounts({
+  //     owner: adminKp.publicKey,
+  //     oracle: oracleBId,
+  //   })
+  //   .signers([adminKp])
+  //   .rpc();
+
+  const name = config.tokenData.symbol + "-SOL";
+  /*
+createMarketIx(
+payer: PublicKey, 
+name: string, q
+uoteMint: PublicKey, 
+baseMint: PublicKey, 
+quoteLotSize: BN, 
+baseLotSize: BN, 
+makerFee: BN, 
+takerFee: BN, 
+timeExpiry: BN, 
+oracleA: PublicKey | null, 
+oracleB: PublicKey | null, 
+openOrdersAdmin: PublicKey | null, 
+consumeEventsAdmin: PublicKey | null, 
+closeMarketAdmin: PublicKey | null, 
+oracleConfigParams?: OracleConfigParams, 
+market?: Keypair, 
+collectFeeAdmin?: PublicKey)
+*/
+  const [ixs, signers] = await client.createMarketIx(
+    authority.publicKey,
+    name,
+    quoteMint,
+    baseMint,
+    new BN(1),
+    new BN(1000000),
+    new BN(1000),
+    new BN(1000),
+    new BN(0),
+    oracleAId,
+    oracleBId,
+    null,
+    null,
+    null
+  );
+
+  const tx = await client.sendAndConfirmTransaction(ixs, {
+    additionalSigners: signers,
+  });
+
+  console.log("created market", tx);
+  console.log(
+    "finished with balance: ",
+    await connection.getBalance(authority.publicKey)
+  );
+}
+
+main();

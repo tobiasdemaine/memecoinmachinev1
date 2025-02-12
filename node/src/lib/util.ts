@@ -23,6 +23,7 @@ import {
   connection,
   makeTxVersion,
   addLookupTableInfo,
+  PROGRAM_ID,
 } from "../config";
 
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
@@ -111,7 +112,7 @@ async function formatAmmKeysById(id: string): Promise<ApiPoolInfoV4> {
     quoteDecimals: info.quoteDecimal.toNumber(),
     lpDecimals: lpMintInfo.decimals,
     version: 4,
-    programId: account.owner.toString(),
+    programId: PROGRAM_ID.AmmV4.toString(), //account.owner.toString(),
     authority: Liquidity.getAssociatedAuthority({
       programId: account.owner,
     }).publicKey.toString(),

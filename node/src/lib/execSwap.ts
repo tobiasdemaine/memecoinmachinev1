@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Liquidity,
   TokenAmount,
-  jsonInfo2PoolKeys,
   buildSimpleTransaction,
+  jsonInfo2PoolKeys,
 } from "@raydium-io/raydium-sdk";
 
 import { VersionedTransaction } from "@solana/web3.js";
@@ -12,27 +11,16 @@ import { VersionedTransaction } from "@solana/web3.js";
 
 import { connection, makeTxVersion, addLookupTableInfo } from "../config";
 
-import { getWalletTokenAccount, formatAmmKeysById, sleepTime } from "./util";
+import { getWalletTokenAccount, formatAmmKeysById } from "./util";
 
 async function execSwap(input) {
   const myKeyPair = input.wallet;
   const myPublicKey = myKeyPair.publicKey;
 
   // -------- pre-action: get pool info --------
-  // const targetPoolInfo = await formatAmmKeysById(input.targetPool)
-  let targetPoolInfo;
-  while (true) {
-    try {
-      targetPoolInfo = await formatAmmKeysById(input.targetPool);
-      if (targetPoolInfo) {
-        break; // If successful, exit the loop
-      }
-    } catch {
-      console.error("pool not found, retrying...");
-    }
-    await sleepTime(1000); // Wait for 1 seconds before retrying
-  }
-  const poolKeys = jsonInfo2PoolKeys(targetPoolInfo);
+  const targetPoolInfo = await formatAmmKeysById(input.targetPool);
+
+  const poolKeys = jsonInfo2PoolKeys(targetPoolInfo); // getPoolKeys(input.targetPool, connection); //
 
   // -------- step 1: coumpute amount out --------
   // const { amountOut, minAmountOut } = Liquidity.computeAmountOut({
@@ -51,9 +39,12 @@ async function execSwap(input) {
     myPublicKey
   );
 
+  console.log(walletTokenAccounts);
+
+  console.log(walletTokenAccounts, myPublicKey);
+
   const instruction = await Liquidity.makeSwapInstructionSimple({
     connection,
-    //@ts-ignore
     poolKeys,
     userKeys: {
       tokenAccounts: walletTokenAccounts,
@@ -64,6 +55,7 @@ async function execSwap(input) {
     fixedSide: "in",
     makeTxVersion,
   });
+
   const { innerTransactions } = instruction;
 
   // const txids = await buildAndSendTx(innerTransactions, { skipPreflight: true })
@@ -93,7 +85,7 @@ async function execSwap(input) {
       );
     }
   }
-  console.log("swapped for ", myPublicKey);
+  /// console.log("swapped for ", myPublicKey);
   console.log("txids : ", txids);
   // return txids;
 }
