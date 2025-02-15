@@ -2,7 +2,7 @@ import subprocess
 import json
 import sys
 
-from tokenFarming.python.audit import auditBaseAccount, auditTokenBaseAccount
+from audit import auditBaseAccount, auditTokenBaseAccount
 
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -23,7 +23,7 @@ def main():
 
     kname = config["mode"] + "_" + config['metaData']['symbol']
     sol_amount = config["SOL_AMOUNT"]
-    
+    print(run_command("pwd"))
     # Generate a keypair for the token mint
     print("Generating token mint keypair...")
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-keypair.json --force --no-passphrase")
@@ -34,12 +34,13 @@ def main():
     if config["mode"] == "DEV":
         auditTokenBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url devnet")
-        run_command(f"solana airdrop 5 {mint_authority}")
-        auditTokenBaseAccount("CREATE TOKEN SOL AIRDROP", "airdropped sol: 5", config)
+        run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
+        auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
     if config["mode"] == "PROD":
         auditBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url mainnet")
-        run_command(f"solana transfer --keypair ./tokens/keys/base-keypair.json --to {mint_authority} {sol_amount}")
+        
+        run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
         auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
         auditTokenBaseAccount("CREATE TOKEN SOL RECEIVE", "recieve sol: {sol_amount}", config)
 

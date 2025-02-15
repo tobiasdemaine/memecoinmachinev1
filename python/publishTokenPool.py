@@ -1,8 +1,9 @@
+import os
 import sys
 import json
 import subprocess
 
-from tokenFarming.python.audit import auditTokenBaseAccount
+from audit import auditTokenBaseAccount
 
 def publishTokenPool(json_file):
     
@@ -15,19 +16,10 @@ def publishTokenPool(json_file):
         print(f"Error reading JSON file: {e}")
         sys.exit(1)
     auditTokenBaseAccount("PRE CREATE POOL", "", args)
-    try:
-        subprocess.run(["cd", "../node"], check=True, shell=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error changing directory: {e.stderr}")
-        sys.exit(1)
-    command = ["npx", "ts-node", "src/newPool.ts", "../"+json_file]
+    command = f"cd ./node && npx ts-node ./src/newPool.ts ../{json_file}"
     
-    try:
-        result = subprocess.run(command, check=True, capture_output=True, text=True)
-        print(result.stdout)
-    except subprocess.CalledProcessError as e:
-        print(f"Error running command: {e.stderr}")
-        sys.exit(1)
+    
+    result = os.system(command)
     auditTokenBaseAccount("POST CREATE POOL", "", args)
 
 if __name__ == "__main__":

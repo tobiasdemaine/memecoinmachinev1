@@ -30,10 +30,9 @@ def start_docker_container(ip_address, username, password, mode, ticker, domain)
     ssh.connect(ip_address, username=username, password=password)
     ssh.exec_command("docker pull nginx")
     docker_command = f"""
-    docker run --name frontend \
+    docker run --name {mode}_{ticker} \
     -v /root/tokens/{mode}_{ticker}:/usr/share/nginx/html:ro \
     -v /root/tokens/nginx.conf:/etc/nginx/nginx.conf:ro -d \
-    -p 8888:80 \
     --env "VIRTUAL_PORT=80"  \
     --env "VIRTUAL_HOST={domain}"  \
     --env "LETSENCRYPT_HOST={domain}" \

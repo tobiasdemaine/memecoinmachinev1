@@ -2,7 +2,7 @@ import json
 import subprocess
 import sys
 
-from tokenFarming.python.audit import auditWalletAccount
+from audit import auditWalletAccount
 
 def run_command(command):
     """Run a shell command and return its output as a string."""

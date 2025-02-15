@@ -4,7 +4,7 @@ import subprocess
 import sys
 import time
 
-from tokenFarming.python.audit import auditAllWalletAccounts
+from audit import auditAllWalletAccounts
 
 # Check for required arguments
 if len(sys.argv) < 2:

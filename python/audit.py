@@ -1,3 +1,4 @@
+import pprint
 import subprocess
 import json
 import os
@@ -25,8 +26,8 @@ def audit(state, address, memo, config):
         result = subprocess.run(['solana', 'balance', address], stdout=subprocess.PIPE)
         return result.stdout.decode('utf-8').strip()
     
-    balance = get_solana_balance(address)
-    print(f"Address: {address}, Balance: {balance}, Memo: {memo}")
+    sbalance = get_solana_balance(address)
+    print(f"Address: {address}, Balance: {sbalance}, Memo: {memo}")
 
     out = run_command(f"spl-token accounts --owner {address}")
     # Extract token balance from the output
@@ -42,22 +43,24 @@ def audit(state, address, memo, config):
     balance["date"] = datetime.now().isoformat()
     balance["state"] = state
     balance["address"] = address
-    balance["sol"] = balance
+    balance["sol"] = sbalance
     balance[config["metaData"]["symbol"]] = token_balance
     balance["memo"] = memo
-
+    print(balance["sol"])
     var.append(balance)
+
+   
     with open(audit_file_path, 'w') as file:
         json.dump(var, file, indent=4)
 
 def auditBaseAccount(state, memo, config):
-    base_keypair_path = "tokens/keys/base_keypair.json"
+    base_keypair_path = "tokens/keys/base-keypair.json"
     address = run_command(f"solana-keygen pubkey {base_keypair_path}")
     audit(state, address, base_keypair_path+" | "+memo, config)
 
 def auditTokenBaseAccount(state, memo, config):
     kname = config["mode"] + "_" + config['metaData']['symbol'] 
-    base_keypair_path = f"tokens/keys/{kname}_keypair.json"
+    base_keypair_path = f"tokens/keys/{kname}-keypair.json"
     address = run_command(f"solana-keygen pubkey {base_keypair_path}")
     audit(state, address, base_keypair_path+" | "+memo, config)
 

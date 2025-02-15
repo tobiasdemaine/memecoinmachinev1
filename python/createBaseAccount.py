@@ -13,10 +13,9 @@ def run_command(command):
 
 def prompt_overwrite(filepath):
     if os.path.exists(filepath):
-        response = input("Base Account already exists. Do you want to overwrite it? (y/N): ").strip().lower()
-        if response != 'y':
-            print("Operation cancelled.")
-            exit(0)
+        print("Operation cancelled.")
+        exit(0)
+    
 def createBaseAccount():
     prompt_overwrite("tokens/keys/base-keypair.json")
 

@@ -4,7 +4,7 @@ import time
 import json
 import sys
 
-from tokenFarming.python.audit import auditAllWalletAccounts
+from audit import auditAllWalletAccounts
 
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
