@@ -9,6 +9,10 @@ from switchToken import switch_token
 from tokenBalance import token_balance
 from removeLiquidity import removeLiquidity
 from getAllSolFromWallets import getAllSolfromWallets
+from masterwalletHoldings import master_wallet_holdings
+from transferSolFromMaster import transferSolFromMaster
+from tokenwalletHoldings import token_wallet_holdings
+from transferFromTokenToMaster import transferFromTokenToMaster
 from tokenSellOut import tokenSellOut
 from walletHoldings import wallet_holdings
 from watchPool import watch
@@ -257,6 +261,34 @@ def tokensellOut():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
     data = tokenSellOut(filePath(mode, symbol))
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/tranferfromtokentomaster', methods=['POST'])
+def tranferfromtokentomaster():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    data = transferFromTokenToMaster(filePath(mode, symbol))
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/tokenwalletholdings', methods=['POST'])
+def tokenwalletholdings():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    data = token_wallet_holdings(filePath(mode, symbol))
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/masterwalletholdings', methods=['POST'])
+def masterwalletholdings():
+    mode = request.json.get('mode')
+    data = master_wallet_holdings(mode)
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/masterwalletspend', methods=['POST'])
+def masterwalletspend():
+    mode = request.json.get('mode')
+    address = request.json.get('address')
+    amount = request.json.get("amount")
+    data = transferSolFromMaster(address, amount, mode)
     return jsonify({"success": True, "data": data}), 200
 
 @app.route('/')

@@ -72,6 +72,34 @@ export const backofficeApi = createApi({
         body,
       }),
     }),
+    tranferSoltoMaster: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/tranferfromtokentomaster",
+        method: "POST",
+        body,
+      }),
+    }),
+    masterWalletBalance: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/masterwalletholdings",
+        method: "POST",
+        body,
+      }),
+    }),
+    tokenWalletBalance: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/tokenwalletholdings",
+        method: "POST",
+        body,
+      }),
+    }),
+    masterWalletSpend: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/masterwalletspend",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -86,4 +114,8 @@ export const {
   useWithdrawLiquidityMutation,
   useSellAllTokensMutation,
   useWithdrawFromAllAccountsMutation,
+  useTranferSoltoMasterMutation,
+  useTokenWalletBalanceMutation,
+  useMasterWalletBalanceMutation,
+  useMasterWalletSpendMutation,
 } = backofficeApi;

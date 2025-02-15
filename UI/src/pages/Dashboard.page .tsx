@@ -1,13 +1,51 @@
-import { Card, SimpleGrid } from "@mantine/core";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Box, Card, SimpleGrid, Text, Title } from "@mantine/core";
+import { useMasterWalletBalanceMutation } from "../redux/services/backofficeAPI";
+import { useEffect, useState } from "react";
 
 export const DashboardPage = () => {
-  console.log(".");
+  const [getBalance] = useMasterWalletBalanceMutation();
+  const [devBalance, setDevBalance] = useState<any>();
+  const [mainnetBalance, setMainnetBalance] = useState<any>();
+
+  const getBalances = async () => {
+    setDevBalance(
+      await getBalance({
+        mode: "DEV",
+      })
+    );
+    setMainnetBalance(
+      await getBalance({
+        mode: "PROD",
+      })
+    );
+  };
+  useEffect(() => {
+    getBalances();
+  }, []);
   return (
     <>
-      <SimpleGrid cols={3}>
-        <Card>Deposit monies to adress : XXXXXXX</Card>
-        <Card>Estimated Dev Net : XXXXXXX</Card>
-        <Card>Estimated Main Net : XXXXXXX</Card>
+      <Card>
+        <Text>
+          Deposit Mainnet & Dev SOL to :{" "}
+          <strong>{devBalance && devBalance.data?.data?.wallet}</strong>
+        </Text>
+      </Card>
+      <SimpleGrid cols={3} mt={20}>
+        <Card>
+          <Title order={4}>MainNet</Title>
+          <Box>
+            Sol:{" "}
+            <strong>{mainnetBalance && mainnetBalance.data?.data?.sol}</strong>
+          </Box>
+        </Card>
+        <Card>
+          <Title order={4}>DevNet</Title>
+
+          <Box>
+            Sol: <strong>{devBalance && devBalance.data?.data?.sol}</strong>
+          </Box>
+        </Card>
       </SimpleGrid>
     </>
   );

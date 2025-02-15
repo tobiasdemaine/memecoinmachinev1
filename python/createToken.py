@@ -33,12 +33,12 @@ def main():
 
     if config["mode"] == "DEV":
         auditTokenBaseAccount("CREATE TOKEN START", "", config)
-        run_command(f"solana config set --url devnet")
+        run_command(f"solana config set --url d")
         run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
         auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
     if config["mode"] == "PROD":
         auditBaseAccount("CREATE TOKEN START", "", config)
-        run_command(f"solana config set --url mainnet")
+        run_command(f"solana config set --url m")
         
         run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
         auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
