@@ -12,6 +12,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { Router } from "./Router";
 import { useAppSelector } from "./redux/hooks";
 import { selectToken } from "./redux/tokenSlice";
+import { Tokens } from "./components/Tokens";
 
 export const Shell = () => {
   const [opened, { toggle, close }] = useDisclosure();
@@ -67,12 +68,12 @@ export const Shell = () => {
 
         <NavLink
           leftSection={<IconCoins size="1rem" stroke={1.5} />}
-          onClick={() => {
-            navigate("/tokens");
-            close();
-          }}
+          childrenOffset={28}
+          href="#required-for-focus"
           label="Tokens"
-        />
+        >
+          <Tokens />
+        </NavLink>
 
         <NavLink
           leftSection={<IconOutbound size="1rem" stroke={1.5} />}

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Box, NavLink, Title } from "@mantine/core";
+import { NavLink, Text } from "@mantine/core";
 import {
   useSwitchTokenMutation,
   useTokensQuery,
@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../redux/hooks";
 import { setToken } from "../redux/tokenSlice";
 
-export const TokensPage = () => {
+export const Tokens = () => {
   const { data, isLoading, refetch } = useTokensQuery();
   const [updatePost] = useSwitchTokenMutation();
   const navigate = useNavigate();
@@ -22,11 +22,13 @@ export const TokensPage = () => {
   console.log(tokens, isLoading);
   return (
     <>
-      <Title order={4}>TOKENS</Title>
+      <Text fz="xs">Mainnet</Text>
       {tokens &&
-        tokens.map((token: any) => (
-          <Box key={token.url}>
+        tokens
+          .filter((token: any) => token.mode === "PROD")
+          .map((token: any) => (
             <NavLink
+              key={token.url}
               leftSection={<IconCoin size="1rem" stroke={1.5} />}
               onClick={async () => {
                 await updatePost({
@@ -42,10 +44,34 @@ export const TokensPage = () => {
                 );
                 navigate("/token");
               }}
-              label={token.mode + "_" + token.metaData?.symbol}
+              label={token.metaData?.symbol}
             />
-          </Box>
-        ))}
+          ))}
+      <Text fz="xs">Devnet</Text>
+      {tokens &&
+        tokens
+          .filter((token: any) => token.mode === "DEV")
+          .map((token: any) => (
+            <NavLink
+              key={token.url}
+              leftSection={<IconCoin size="1rem" stroke={1.5} />}
+              onClick={async () => {
+                await updatePost({
+                  mode: token.mode,
+                  symbol: token.metaData.symbol,
+                });
+                dispatch(
+                  setToken({
+                    mode: token.mode,
+                    symbol: token.metaData.symbol,
+                    data: token,
+                  })
+                );
+                navigate("/token");
+              }}
+              label={token.metaData?.symbol}
+            />
+          ))}
     </>
   );
 };

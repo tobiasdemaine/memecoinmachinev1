@@ -15,7 +15,7 @@ export const backofficeApi = createApi({
       return headers;
     },*/
   }),
-  tagTypes: ["token"],
+  tagTypes: ["tokens"],
   endpoints: (builder) => ({
     watch: builder.mutation<any, any>({
       query: (body) => ({
@@ -28,6 +28,7 @@ export const backofficeApi = createApi({
       query: () => ({
         url: "/list",
         method: "GET",
+        providesTags: ["tokens"],
       }),
     }),
     switchToken: builder.mutation<any, any>({
@@ -121,6 +122,15 @@ export const backofficeApi = createApi({
         body,
       }),
     }),
+    newTokenStep1: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/newTokenStep1",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["tokens"],
+    }),
+    //,
   }),
 });
 
