@@ -12,6 +12,7 @@ import {
   IconCoin,
   IconFileDatabase,
   IconPool,
+  IconUsers,
   IconWebhook,
 } from "@tabler/icons-react";
 import { Audit } from "../components/Audit";
@@ -19,6 +20,7 @@ import { TradingAccounts } from "../components/TradingAccounts";
 import { Data } from "../components/Data";
 import { Pool } from "../components/Pool";
 import { Account } from "../components/Account";
+import { Website } from "../components/Website";
 
 export const TokenPage = () => {
   const token = useAppSelector(selectToken);
@@ -59,17 +61,11 @@ export const TokenPage = () => {
     <>
       <Tabs defaultValue={"Pool"}>
         <Tabs.List>
-          <Tabs.Tab value="Account" leftSection={<IconPool size={12} />}>
-            Account
-          </Tabs.Tab>
           <Tabs.Tab value="Pool" leftSection={<IconPool size={12} />}>
             Pool
           </Tabs.Tab>
-          <Tabs.Tab value="Audit" leftSection={<IconCoin size={12} />}>
-            Audit
-          </Tabs.Tab>
-          <Tabs.Tab value="Accounts" leftSection={<IconPool size={12} />}>
-            Trading Accounts
+          <Tabs.Tab value="Account" leftSection={<IconUsers size={12} />}>
+            Accounts
           </Tabs.Tab>
 
           <Tabs.Tab value="Website" leftSection={<IconWebhook size={12} />}>
@@ -78,11 +74,19 @@ export const TokenPage = () => {
           <Tabs.Tab value="Data" leftSection={<IconFileDatabase size={12} />}>
             Data
           </Tabs.Tab>
+          <Tabs.Tab value="Audit" leftSection={<IconCoin size={12} />}>
+            Audit
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel value="Audit">
           <Audit data={auditData} />
         </Tabs.Panel>
+
+        <Tabs.Panel value="Website">
+          <Website />
+        </Tabs.Panel>
+
         <Tabs.Panel value="Account">
           <Account
             data={balanceData}
@@ -94,8 +98,6 @@ export const TokenPage = () => {
             }}
             isLoading={balanceResult.isLoading}
           />
-        </Tabs.Panel>
-        <Tabs.Panel value="Accounts">
           <TradingAccounts
             data={tradingAccountsData}
             isLoading={tradingAccountsResult.isLoading}
@@ -107,6 +109,7 @@ export const TokenPage = () => {
             }}
           />
         </Tabs.Panel>
+
         <Tabs.Panel value="Data">
           <Data token={token} />
         </Tabs.Panel>

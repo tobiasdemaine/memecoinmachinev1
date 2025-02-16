@@ -13,7 +13,7 @@ def run_command(command):
         exit(1)
     return result.stdout.strip()
 
-def transferFromTokenToMaster(json_filePath):
+def transferFromTokenToMaster(json_file_path):
     
     with open(json_file_path, 'r') as f:
         config = json.load(f)

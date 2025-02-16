@@ -31,6 +31,7 @@ export const Account = ({
               mode: token.mode,
               symbol: token.symbol,
             });
+            refresh();
             notifications.show({
               title: "Transaction Complete",
               message: "The Transcation has Completed!",

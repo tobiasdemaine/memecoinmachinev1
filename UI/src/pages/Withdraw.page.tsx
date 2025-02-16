@@ -11,11 +11,14 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Confirm } from "../components/Confirm";
-import { useMasterWalletBalanceMutation } from "../redux/services/backofficeAPI";
+import {
+  useMasterWalletBalanceMutation,
+  useMasterWalletSpendMutation,
+} from "../redux/services/backofficeAPI";
 import { notifications } from "@mantine/notifications";
 
 export const WithdrawPage = () => {
-  const [masterSpend, { isLoading }] = useMasterWalletBalanceMutation();
+  const [masterSpend, { isLoading }] = useMasterWalletSpendMutation();
   const [getBalance] = useMasterWalletBalanceMutation();
   const [devBalance, setDevBalance] = useState<any>();
   const [mainnetBalance, setMainnetBalance] = useState<any>();
@@ -96,6 +99,7 @@ export const WithdrawPage = () => {
                   amount: withdrawAmount,
                   mode: network === "Mainnet" ? "PROD" : "DEV",
                 });
+                getBalances();
                 notifications.show({
                   title: "Transaction Complete",
                   message: "The Transcation has Completed!",

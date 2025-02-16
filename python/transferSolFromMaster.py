@@ -28,6 +28,8 @@ def transfer_sol(sender_wallet, recipient_wallet, amount, mode):
     #    sys.exit(0)
     transfer_cmd = f"solana transfer {recipient_wallet} {amount} --keypair {sender_wallet} --allow-unfunded-recipient --url {mode}"
     #transfer_cmd = f"solana transfer --allow-unfunded-recipient --keypair {sender_wallet} {recipient_wallet} {amount} --fee-payer {sender_wallet}"
+    x =run_command("pwd")
+    print(x)
     run_command(transfer_cmd)
     print(f"✅ Successfully transferred {amount:.6f} SOL to {recipient_wallet}.")
 
@@ -35,19 +37,19 @@ def transfer_sol(sender_wallet, recipient_wallet, amount, mode):
 
 
 def transferSolFromMaster(address, amount, mode):
-    bk = "tokens/keys/base-keypair.py"  
+    bk = "tokens/keys/base-keypair.json"  
     m = "m"
     if mode=="DEV":
         m= "d"
-    transfer_sol(address, recipient_wallet, amount, m)
+    transfer_sol(bk, address,  amount, m)
     
 
 if __name__ == "__main__":
     if len(sys.argv) < 4:
         print("Usage: python transfer_sol.py <recipient_wallet_address> <amount> <mode>")
         sys.exit(1)
-    recipient_wallet = sys.argv[1]
+    sendwallet = sys.argv[1]
     amount = sys.argv[2]
     mode = sys.argv[3]
-    transferSolFromMaster(recipient_wallet, amount, mode)
+    transferSolFromMaster(sendwallet, amount, mode)
     

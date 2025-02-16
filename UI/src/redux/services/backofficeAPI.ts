@@ -100,6 +100,27 @@ export const backofficeApi = createApi({
         body,
       }),
     }),
+    regenerateSite: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/regeneratesite",
+        method: "POST",
+        body,
+      }),
+    }),
+    republishSite: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/republishsite",
+        method: "POST",
+        body,
+      }),
+    }),
+    saveJson: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/tokenjsonsave",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -118,4 +139,7 @@ export const {
   useTokenWalletBalanceMutation,
   useMasterWalletBalanceMutation,
   useMasterWalletSpendMutation,
+  useRegenerateSiteMutation,
+  useRepublishSiteMutation,
+  useSaveJsonMutation,
 } = backofficeApi;
