@@ -154,7 +154,7 @@ def publishtokenpool():
 def tokenjsonsave():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
-    json = request.json.get('json')
+    json = request.json.get('data')
     with open(filePath(mode, symbol), 'w') as file:
         file.write(json)
     with open(filePath(mode, symbol), 'r') as file:

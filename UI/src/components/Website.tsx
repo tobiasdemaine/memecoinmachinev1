@@ -70,7 +70,7 @@ export const Website = () => {
             await saveJson({
               mode: token.mode,
               symbol: token.symbol,
-              data: { ...token.data, website },
+              data: JSON.stringify({ ...token.data, website }),
             });
             notifications.show({
               title: "Website Data",
