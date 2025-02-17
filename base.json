@@ -1,4 +1,5 @@
 {
+  "status": "begin",
   "SOL_AMOUNT": 1,
   "mode": "DEV",
   "url": "https://www.littlecpaitalist.com/",
@@ -42,6 +43,7 @@
     "uri": "https://www.littlecpaitalist.com/"
   },
   "website": {
+    "status": "none",
     "symbol": "LITTLE",
     "gradientStart": "#6E7DFF",
     "gradientEnd": "#D4A5F9",

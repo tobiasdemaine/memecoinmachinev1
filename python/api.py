@@ -10,6 +10,9 @@ from tokenBalance import token_balance
 from removeLiquidity import removeLiquidity
 from getAllSolFromWallets import getAllSolfromWallets
 from masterwalletHoldings import master_wallet_holdings
+from createStep1 import createStep1
+from createStep2 import createStep2
+from previewWebsite import previewWebsite
 from transferSolFromMaster import transferSolFromMaster
 from tokenwalletHoldings import token_wallet_holdings
 from transferFromTokenToMaster import transferFromTokenToMaster
@@ -26,6 +29,7 @@ import os
 
 from flask_cors import CORS
 from flask import send_from_directory
+import threading
 app = Flask(__name__)
 CORS(app)
 # Sample data
@@ -150,15 +154,17 @@ def publishtokenpool():
         data = json.loads(file.read())
     return jsonify({"success": True, "data": data}), 200
 
-@app.route('/tokenjsonsave', methods=['POST'])
-def tokenjsonsave():
+@app.route('/tokenwebsitejsonsave', methods=['POST'])
+def tokenwebsitejsonsave():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
     json = request.json.get('data')
-    with open(filePath(mode, symbol), 'w') as file:
-        file.write(json)
+    
     with open(filePath(mode, symbol), 'r') as file:
         data = json.loads(file.read())
+    data["website"] = json
+    with open(filePath(mode, symbol), 'w') as file:
+        file.write(data)
     return jsonify({"success": True, "data": data}), 200
 
 @app.route('/tokenjson', methods=['POST'])
@@ -290,6 +296,44 @@ def masterwalletspend():
     amount = request.json.get("amount")
     data = transferSolFromMaster(address, amount, mode)
     return jsonify({"success": True, "data": data}), 200
+
+@app.route('/createStep1', methods=['POST'])
+def createstep1():
+    threading.Thread(target=createStep1, args=(request,)).start()
+    return jsonify({"success": True})
+
+@app.route('/createStep2', methods=['POST'])
+def createstep2():
+    threading.Thread(target=createStep2, args=(request,)).start()
+    return jsonify({"success": True})
+
+@app.route('/status', methods=['POST'])
+def tokenjson():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    st = {}
+    st["status"] = None
+    if not os.path.exists(filePath(mode, symbol)):
+        return jsonify({"success": True, "data": st }), 200
+    with open(filePath(mode, symbol), 'r') as file:
+        data = json.loads(file.read())
+    return jsonify({"success": True, "data": data}), 200
+
+@app.route('/previewwebsite', methods=['POST'])
+def previewwebsite():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    json = request.json.get('data')
+    previewWebsite(filePath(mode, symbol), json)
+    return jsonify({"success": True, }), 200
+
+@app.route('/website')
+def home():
+    return send_from_directory('../reactApp/dist', 'index.html')
+
+@app.route('/website/<path:path>', methods=["GET"])
+def serve_static(path):
+    return send_from_directory('../reactApp/dist', path)
 
 @app.route('/')
 def home():

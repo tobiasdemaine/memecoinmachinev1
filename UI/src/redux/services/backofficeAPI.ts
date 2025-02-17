@@ -117,7 +117,14 @@ export const backofficeApi = createApi({
     }),
     saveJson: builder.mutation<any, any>({
       query: (body) => ({
-        url: "/tokenjsonsave",
+        url: "/tokenwebsitejsonsave",
+        method: "POST",
+        body,
+      }),
+    }),
+    status: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/status",
         method: "POST",
         body,
       }),
@@ -125,6 +132,14 @@ export const backofficeApi = createApi({
     newTokenStep1: builder.mutation<any, any>({
       query: (body) => ({
         url: "/newTokenStep1",
+        method: "POST",
+        body,
+      }),
+      invalidatesTags: ["tokens"],
+    }),
+    newTokenStep2: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/newTokenStep2",
         method: "POST",
         body,
       }),
@@ -152,4 +167,7 @@ export const {
   useRegenerateSiteMutation,
   useRepublishSiteMutation,
   useSaveJsonMutation,
+  useNewTokenStep1Mutation,
+  useNewTokenStep2Mutation,
+  useStatusMutation,
 } = backofficeApi;

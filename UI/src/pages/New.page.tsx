@@ -12,11 +12,20 @@ import {
   Box,
   Title,
 } from "@mantine/core";
+import {
+  useNewTokenStep1Mutation,
+  backofficeApi,
+} from "../redux/services/backofficeAPI";
+import { useNavigate } from "react-router-dom";
+import { useAppDispatch } from "../redux/hooks";
+import { setToken } from "../redux/tokenSlice";
+import { notifications } from "@mantine/notifications";
+import { Confirm } from "../components/Confirm";
 
 interface CreateData {
   //token
   mode: string; //select DEV | PROD
-  Symbol: string;
+  symbol: string;
   description: string;
   name: string;
   initialSupply: number;
@@ -52,9 +61,10 @@ interface CreateData {
 }
 
 export const NewPage = () => {
+  //const []
   const [formData, setFormData] = useState<CreateData>({
     mode: "Devnet",
-    Symbol: "",
+    symbol: "",
     description: "",
     name: "",
     initialSupply: 10_000_000,
@@ -80,9 +90,12 @@ export const NewPage = () => {
     lotSize: 1,
     tickSize: 0.0001,
     addBaseAmountNumber: 700000,
-    addQuoteAmountNumber: 1,
+    addQuoteAmountNumber: 0,
   });
-
+  const navigate = useNavigate();
+  const [submitForm, { isLoading }] = useNewTokenStep1Mutation();
+  const [getStatus] = useNewTokenStep1Mutation();
+  const dispatch = useAppDispatch();
   const handleChange = (field: keyof CreateData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -90,7 +103,7 @@ export const NewPage = () => {
   const handleSubmit = () => {
     const requiredFields = [
       "mode",
-      "Symbol",
+      "symbol",
       "description",
       "name",
       "initialSupply",
@@ -99,13 +112,6 @@ export const NewPage = () => {
       "logo",
       "RPC_MAIN",
       "RPC_DEV",
-      "useWebsiteBuilder",
-      "hero",
-      "domain",
-      "ip4",
-      "ip6",
-      "ssh_user",
-      "ssh_password",
       "startAmount",
       "tradingWalletsNumber",
       "walletBaseAmount",
@@ -114,6 +120,17 @@ export const NewPage = () => {
       "addBaseAmountNumber",
       "addQuoteAmountNumber",
     ];
+
+    if (formData.useWebsiteBuilder) {
+      requiredFields.push(
+        "hero",
+        "domain",
+        "ip4",
+        "ip6",
+        "ssh_user",
+        "ssh_password"
+      );
+    }
     const isValid = requiredFields.every(
       (field) => formData[field as keyof CreateData]
     );
@@ -121,6 +138,52 @@ export const NewPage = () => {
       alert("Please fill all required fields");
     } else {
       // Submit form
+      const formDataToSubmit = new FormData();
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value instanceof File) {
+          formDataToSubmit.append(key, value);
+        } else {
+          formDataToSubmit.append(key, value.toString());
+        }
+      });
+
+      submitForm(formDataToSubmit)
+        .unwrap()
+        .then(() => {
+          const getstatus = async () => {
+            notifications.show({
+              title: "Token Creation Started",
+              message: "Regeneration of Website Completed!",
+            });
+            const res = await getStatus({
+              symbol: formData.symbol,
+              mode: formData.mode,
+            });
+            if (res.data.status !== null) {
+              dispatch(backofficeApi.util.invalidateTags(["tokens"]));
+              dispatch(
+                setToken({
+                  symbol: res.data.tokenData.symbol,
+                  mode: res.data.mode,
+                  data: res.data,
+                })
+              );
+
+              notifications.show({
+                title: "Token creation in progress",
+                message: "Status " + res.data.status,
+              });
+              navigate("/token");
+            }
+          };
+          setTimeout(getstatus, 500);
+        })
+        .catch((error) => {
+          notifications.show({
+            title: "Error!",
+            message: error,
+          });
+        });
     }
   };
 
@@ -137,8 +200,8 @@ export const NewPage = () => {
           />
           <TextInput
             label="Symbol"
-            value={formData.Symbol}
-            onChange={(e) => handleChange("Symbol", e.target.value)}
+            value={formData.symbol}
+            onChange={(e) => handleChange("symbol", e.target.value)}
           />
           <TextInput
             label="Description"
@@ -206,31 +269,37 @@ export const NewPage = () => {
           <FileInput
             label="Hero"
             onChange={(file) => handleChange("hero", file)}
+            disabled={!formData.useWebsiteBuilder}
           />
           <TextInput
             label="Domain"
             value={formData.domain}
             onChange={(e) => handleChange("domain", e.target.value)}
+            disabled={!formData.useWebsiteBuilder}
           />
           <TextInput
             label="IP4"
             value={formData.ip4}
             onChange={(e) => handleChange("ip4", e.target.value)}
+            disabled={!formData.useWebsiteBuilder}
           />
           <TextInput
             label="IP6"
             value={formData.ip6}
             onChange={(e) => handleChange("ip6", e.target.value)}
+            disabled={!formData.useWebsiteBuilder}
           />
           <TextInput
             label="SSH User"
             value={formData.ssh_user}
             onChange={(e) => handleChange("ssh_user", e.target.value)}
+            disabled={!formData.useWebsiteBuilder}
           />
           <TextInput
             label="SSH Password"
             value={formData.ssh_password}
             onChange={(e) => handleChange("ssh_password", e.target.value)}
+            disabled={!formData.useWebsiteBuilder}
           />
         </Box>
         <Box>
@@ -265,19 +334,27 @@ export const NewPage = () => {
             onChange={(value) => handleChange("tickSize", value)}
           />
           <NumberInput
-            label="Add Base Amount Number"
+            label="Amount of Tokens at start of pool"
             value={formData.addBaseAmountNumber}
             onChange={(value) => handleChange("addBaseAmountNumber", value)}
           />
           <NumberInput
-            label="Add Quote Amount Number"
+            label="Amount of Sol at start of pool"
             value={formData.addQuoteAmountNumber}
             onChange={(value) => handleChange("addQuoteAmountNumber", value)}
           />
         </Box>
       </SimpleGrid>
       <Group mt="md">
-        <Button onClick={handleSubmit}>Next Step</Button>
+        <Button onClick={handleSubmit}></Button>
+        <Confirm
+          text="Are you sure you want to create this token?"
+          buttonText="Regenerate Site"
+          isLoading={isLoading}
+          confirm={async () => {
+            handleSubmit();
+          }}
+        />
       </Group>
     </form>
   );

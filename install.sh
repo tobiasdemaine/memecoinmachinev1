@@ -25,6 +25,8 @@ pip3 install requests
 pip3 install pyopenssl
 pip3 install pyasn1
 pip3 install paramiko
+pip3 install pillow
+
 
 # Verify installation
 python3 --version

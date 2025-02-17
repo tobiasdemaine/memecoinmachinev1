@@ -3,8 +3,6 @@ import sys
 import json
 import shutil
 import subprocess
-import requests
-import re
 
 def upload_to_ipfs(file_path):
     url = 'https://ipfs.infura.io:5001/api/v0/add'
@@ -28,7 +26,9 @@ def generateMetaData(json_file_path):
     meta_dest_dir = './reactApp/token/public/'
     basename = os.path.splitext(os.path.basename(json_file_path))[0]
     os.makedirs(media_dest_dir, exist_ok=True)
-    shutil.copy(os.path.join(media_src_dir, f'{basename}_hero.png'), os.path.join(media_dest_dir, 'hero.png'))
+    hero_image_path = os.path.join(media_src_dir, f'{basename}_hero.png')
+    if os.path.exists(hero_image_path):
+        shutil.copy(hero_image_path, os.path.join(media_dest_dir, 'hero.png'))
     shutil.copy(os.path.join(media_src_dir, f'{basename}_logo.png'), os.path.join(media_dest_dir, 'logo.png'))
 
     # Upload logo.png to IPFS

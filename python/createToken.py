@@ -12,12 +12,9 @@ def run_command(command):
         exit(1)
     return result.stdout.strip()
 
-def main():
+def createToken(json_file_path):
      # Load configuration from JSON file
-    if len(sys.argv) < 2:
-        print("Usage: python createToken.py <config_file>")
-        exit(1)
-    json_file_path = sys.argv[1]
+    
     with open(json_file_path, 'r') as f:
         config = json.load(f)
 
@@ -115,4 +112,8 @@ def main():
         json.dump(config, f, indent=4)
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) < 2:
+        print("Usage: python createToken.py <config_file>")
+        exit(1)
+    json_file_path = sys.argv[1]
+    createToken(json_file_path)
