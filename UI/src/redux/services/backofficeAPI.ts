@@ -52,6 +52,7 @@ export const backofficeApi = createApi({
         body,
       }),
     }),
+
     withdrawLiquidity: builder.mutation<any, any>({
       query: (body) => ({
         url: "/withdrawliquidity",
@@ -135,7 +136,6 @@ export const backofficeApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["tokens"],
     }),
     newTokenStep2: builder.mutation<any, any>({
       query: (body) => ({
@@ -143,7 +143,20 @@ export const backofficeApi = createApi({
         method: "POST",
         body,
       }),
-      invalidatesTags: ["tokens"],
+    }),
+    tradeSwap: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/swapAll",
+        method: "POST",
+        body,
+      }),
+    }),
+    tradeSwapSome: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/swapSome",
+        method: "POST",
+        body,
+      }),
     }),
     //,
   }),
@@ -170,4 +183,6 @@ export const {
   useNewTokenStep1Mutation,
   useNewTokenStep2Mutation,
   useStatusMutation,
+  useTradeSwapMutation,
+  useTradeSwapSomeMutation,
 } = backofficeApi;

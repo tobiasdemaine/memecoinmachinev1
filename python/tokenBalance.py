@@ -2,7 +2,6 @@ import json
 import os
 import subprocess
 import sys
-import time
 
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)

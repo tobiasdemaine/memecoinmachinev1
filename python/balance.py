@@ -1,10 +1,23 @@
 import subprocess
 import sys
 
+def run_command(command):
+    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Error running command: {command}")
+        print(result.stderr)
+        exit(1)
+    return result.stdout.strip()
+
+def get_token_balance(address):
+    out = run_command(f"spl-token accounts --owner {address}")
+    # Extract token balance from the output
+    lines = out.splitlines()
+    token_balance_line = lines[2].split()[1]
+    token_balance = token_balance_line
+    return token_balance
+    
 def get_balance(keypath):
-    balance = get_balance(keypath)
-    if balance is not None:
-        print(f"Balance for {keypath}: {balance}")
     try:
         result = subprocess.run(
             ['solana', 'balance', keypath],
@@ -19,7 +32,7 @@ def get_balance(keypath):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python baseBalance.py <token.json>")
+        print("Usage: python balance.py <token.json>")
         sys.exit(1)
 
     keypath = sys.argv[1]

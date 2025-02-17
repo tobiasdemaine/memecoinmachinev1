@@ -4,7 +4,7 @@ from createBaseAccount import createBaseAccount
 from publishToken import publishToken
 from publishTokenMarket import publishTokenMarket
 from publishTokenPool import publishTokenPool
-from balance import get_balance
+from balance import get_balance, get_token_balance
 from switchToken import switch_token
 from tokenBalance import token_balance
 from removeLiquidity import removeLiquidity
@@ -195,6 +195,18 @@ def listkeypairs():
                 keypairs.append(f.read())
     return jsonify({"success": True, "data": keypairs}), 200
 
+@app.route('/tradingaccounts', methods=['POST'])
+def tradingAccounts():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    wallets = []
+    with open(f'tokens/wallets/{mode}_{symbol}_wallets.json', 'r') as file:
+        wallets = json.load(file)
+
+        for wallet_address, wallet_file in wallets.items():
+            wallets
+    return jsonify({"success": True, "data": wallets}), 200
+
 @app.route('/listwallets', methods=['GET'])
 def listwallets():
     wallets = []
@@ -217,6 +229,8 @@ def walletholdings():
     mode = request.json.get('mode')
     w =wallet_holdings(filePath(mode, symbol))
     return jsonify({"success": True, "data": w}), 200
+
+
 
 @app.route('/basebalance', methods=['GET'])
 def baseBalance():
@@ -308,7 +322,7 @@ def createstep2():
     return jsonify({"success": True})
 
 @app.route('/status', methods=['POST'])
-def tokenjson():
+def status():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
     st = {}
@@ -327,12 +341,32 @@ def previewwebsite():
     previewWebsite(filePath(mode, symbol), json)
     return jsonify({"success": True, }), 200
 
+@app.route('/swapall', methods=['POST'])
+def swapAll():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    keypath = request.json.get('keypath')
+    swapout = request.json.get('swapout')
+
+    #previewWebsite(filePath(mode, symbol), json)
+    return jsonify({"success": True, }), 200
+
+@app.route('/swapsome', methods=['POST'])
+def swapAll():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    keypath = request.json.get('keypath')
+    swapout = request.json.get('swapout')
+    amount = request.json.get('aount')
+    #previewWebsite(filePath(mode, symbol), json)
+    return jsonify({"success": True, }), 200
+
 @app.route('/website')
-def home():
+def website():
     return send_from_directory('../reactApp/dist', 'index.html')
 
 @app.route('/website/<path:path>', methods=["GET"])
-def serve_static(path):
+def website_serve_static(path):
     return send_from_directory('../reactApp/dist', path)
 
 @app.route('/')

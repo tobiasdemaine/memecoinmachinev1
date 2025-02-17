@@ -2,7 +2,7 @@
 import { Box, Button, Group, Loader, Modal } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 
-import { useDisclosure, useViewportSize } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { NumberInput } from "@mantine/core";
 import { useWithdrawLiquidityMutation } from "../redux/services/backofficeAPI";
@@ -22,7 +22,6 @@ export const Pool = ({
   symbol: string;
 }) => {
   const [withdraw, { isLoading: il }] = useWithdrawLiquidityMutation();
-  const { width } = useViewportSize();
   const [opened, { open, close }] = useDisclosure(false);
   const [withdrawAmount, setWithdrawAmount] = useState<number | undefined>(
     undefined
@@ -49,13 +48,7 @@ export const Pool = ({
 
   return (
     <>
-      <Modal
-        opened={opened}
-        onClose={close}
-        title="Withdraw from pool"
-        withinPortal={false}
-        style={{ marginLeft: width < 768 ? -15 : -185 }}
-      >
+      <Modal opened={opened} onClose={close} title="Withdraw from pool">
         <NumberInput
           value={withdrawAmount}
           onChange={(value) => setWithdrawAmount(Number(value))}
