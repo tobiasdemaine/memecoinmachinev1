@@ -13,6 +13,7 @@ from masterwalletHoldings import master_wallet_holdings
 from createStep1 import createStep1
 from createStep2 import createStep2
 from previewWebsite import previewWebsite
+from move import move_sol_to_wallet, move_token_to_wallet
 from transferSolFromMaster import transferSolFromMaster
 from tokenwalletHoldings import token_wallet_holdings
 from transferFromTokenToMaster import transferFromTokenToMaster
@@ -24,6 +25,7 @@ from generateSite import generateSite
 from regenerateSite import regenerateSite
 from publishWebsite import publishWebsite
 from republishWebsite import republishWebsite
+from swap import swap_all, swap_some
 from flask import request
 import os
 
@@ -244,6 +246,14 @@ def tokenbalance():
     w = token_balance(filePath(mode, symbol))
     return jsonify({"success": True, "data": w}), 200
 
+@app.route('/getbalance', methods=["POST"])
+def getBalance():
+    keypath = request.json.get('keypath')  
+    data = {}
+    data["sol"] = get_balance(keypath)
+    data["token"]  = get_token_balance(keypath)
+    return jsonify({"success": True, "data": data}), 200
+
 @app.route('/switchToken', methods=['POST'])
 def switchToken():
     symbol = request.json.get('symbol')
@@ -347,18 +357,38 @@ def swapAll():
     mode = request.json.get('mode')
     keypath = request.json.get('keypath')
     swapout = request.json.get('swapout')
-
+    swap_all(filePath(mode, symbol), keypath, swapout)
     #previewWebsite(filePath(mode, symbol), json)
     return jsonify({"success": True, }), 200
 
 @app.route('/swapsome', methods=['POST'])
-def swapAll():
+def swapSome():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
     keypath = request.json.get('keypath')
     swapout = request.json.get('swapout')
-    amount = request.json.get('aount')
-    #previewWebsite(filePath(mode, symbol), json)
+    amount = request.json.get('amount')
+    swap_some(filePath(mode, symbol), keypath, swapout, amount)
+    return jsonify({"success": True, }), 200
+
+@app.route('/movesoltowallet', methods=['POST'])
+def movesoltowallet():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    keypathfrom = request.json.get('keypathfrom')
+    keypathto = request.json.get('keypathto')
+    amount = request.json.get('amount')
+    move_sol_to_wallet(filePath(mode, symbol), keypathfrom, keypathto, amount)
+    return jsonify({"success": True, }), 200
+
+@app.route('/movetokentowallet', methods=['POST'])
+def movetokentowallet():
+    symbol = request.json.get('symbol')
+    mode = request.json.get('mode')
+    keypathfrom = request.json.get('keypathfrom')
+    keypathto = request.json.get('keypathto')
+    amount = request.json.get('amount')
+    move_token_to_wallet(filePath(mode, symbol), keypathfrom, keypathto, amount)
     return jsonify({"success": True, }), 200
 
 @app.route('/website')

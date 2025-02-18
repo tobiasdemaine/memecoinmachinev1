@@ -18,26 +18,29 @@ export const Account = ({
 }) => {
   const token = useAppSelector(selectToken);
   const [moveFunds, { isLoading: il }] = useTranferSoltoMasterMutation();
+
   console.log(data);
   return (
     <>
       <Group mt={10} mb={10} justify="space-between">
-        <Confirm
-          text="Are you sure you want to move all the funds to the master wallet?"
-          buttonText="Move All Sol to Master Wallet"
-          isLoading={il}
-          confirm={async () => {
-            await moveFunds({
-              mode: token.mode,
-              symbol: token.symbol,
-            });
-            refresh();
-            notifications.show({
-              title: "Transaction Complete",
-              message: "The Transcation has Completed!",
-            });
-          }}
-        />
+        <Group>
+          <Confirm
+            text="Are you sure you want to move all the funds to the master wallet?"
+            buttonText="Move All Sol to Master Wallet"
+            isLoading={il}
+            confirm={async () => {
+              await moveFunds({
+                mode: token.mode,
+                symbol: token.symbol,
+              });
+              refresh();
+              notifications.show({
+                title: "Transaction Complete",
+                message: "The Transcation has Completed!",
+              });
+            }}
+          />
+        </Group>
         <IconRefresh
           onClick={() => {
             refresh();

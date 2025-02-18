@@ -138,6 +138,7 @@ export const TokenPage = () => {
                   symbol: token.data.metaData.symbol,
                 });
               }}
+              balance={balanceResult}
             />
           </Tabs.Panel>
 

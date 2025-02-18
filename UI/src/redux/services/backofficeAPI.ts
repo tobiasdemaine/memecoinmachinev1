@@ -146,14 +146,35 @@ export const backofficeApi = createApi({
     }),
     tradeSwap: builder.mutation<any, any>({
       query: (body) => ({
-        url: "/swapAll",
+        url: "/swapall",
         method: "POST",
         body,
       }),
     }),
     tradeSwapSome: builder.mutation<any, any>({
       query: (body) => ({
-        url: "/swapSome",
+        url: "/swapsome",
+        method: "POST",
+        body,
+      }),
+    }),
+    getBalance: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/getbalance",
+        method: "POST",
+        body,
+      }),
+    }),
+    moveTokensToWallet: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/movetokenstowallet",
+        method: "POST",
+        body,
+      }),
+    }),
+    moveSolToWallet: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/movetokenstowallet",
         method: "POST",
         body,
       }),
@@ -185,4 +206,7 @@ export const {
   useStatusMutation,
   useTradeSwapMutation,
   useTradeSwapSomeMutation,
+  useGetBalanceMutation,
+  useMoveSolToWalletMutation,
+  useMoveTokensToWalletMutation,
 } = backofficeApi;
