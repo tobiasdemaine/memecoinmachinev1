@@ -4,6 +4,8 @@ import subprocess
 import sys
 import time
 
+from createBaseAccount import createBaseAccount
+
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
     if result.returncode != 0:
@@ -23,7 +25,7 @@ def master_wallet_holdings(mode):
     data = {}
     if not os.path.isfile(WALLETS_FILE):
         print(f"Wallet file {WALLETS_FILE} not found. Run the generate script first.")
-        sys.exit(1)
+        createBaseAccount()
 
        
     

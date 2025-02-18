@@ -3,10 +3,12 @@ import { Box, Button, Group, Loader, Modal } from "@mantine/core";
 import { IconRefresh } from "@tabler/icons-react";
 
 import { useDisclosure } from "@mantine/hooks";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NumberInput } from "@mantine/core";
 import { useWithdrawLiquidityMutation } from "../redux/services/backofficeAPI";
 import { notifications } from "@mantine/notifications";
+import { useAppSelector } from "../redux/hooks";
+import { selectToken } from "../redux/tokenSlice";
 
 export const Pool = ({
   watchdata,
@@ -26,6 +28,25 @@ export const Pool = ({
   const [withdrawAmount, setWithdrawAmount] = useState<number | undefined>(
     undefined
   );
+  const token = useAppSelector(selectToken);
+  const [watchData, setWatchData] = useState<any>();
+
+  const saveData = (dataToSave: any) => {
+    localStorage.setItem(
+      `${token.mode}_${token.symbol}_pool`,
+      JSON.stringify(dataToSave)
+    );
+  };
+
+  const loadData = () => {
+    const savedData = localStorage.getItem(
+      `${token.mode}_${token.symbol}_pool`
+    );
+    if (savedData) {
+      return JSON.parse(savedData);
+    }
+    return undefined;
+  };
 
   const calculatePercentage = (amount: number | undefined) => {
     if (!amount || !watchdata) return 0;
@@ -45,7 +66,19 @@ export const Pool = ({
       calculatePercentage(amount)
     );
   };
-
+  useEffect(() => {
+    const ld = loadData();
+    if (ld && !watchdata) {
+      setWatchData({ ...ld });
+    }
+    if (watchdata) {
+      if (Object.keys(watchdata).length > 0) {
+        setWatchData({ ...watchdata });
+        saveData({ ...watchdata });
+      }
+    }
+  }, [watchdata]);
+  //console.log(watchdata, watchData);
   return (
     <>
       <Modal opened={opened} onClose={close} title="Withdraw from pool">
@@ -95,54 +128,58 @@ export const Pool = ({
           Withdraw from Pool
         </Button>
 
-        <IconRefresh
-          onClick={() => {
-            refresh();
-          }}
-          color="rgb(25, 113, 194)"
-        />
+        {isLoading ? (
+          <Loader size={20} />
+        ) : (
+          <IconRefresh
+            onClick={() => {
+              refresh();
+            }}
+            color="rgb(25, 113, 194)"
+          />
+        )}
       </Group>
-      {isLoading ? (
+      {!watchData ? (
         <Loader />
       ) : (
         <>
-          {watchdata && (
+          {watchData && (
             <>
               <Box>
-                Total Pool: <b>{watchdata.totalPool}</b>
+                Total Pool: <b>{watchData.totalPool}</b>
               </Box>
               <Box>
-                Burn Amount: <b>{watchdata.burnAmt}</b>
+                Burn Amount: <b>{watchData.burnAmt}</b>
               </Box>
               <Box>
-                LP Burned: <b>{watchdata.lpBurned}</b>
+                LP Burned: <b>{watchData.lpBurned}</b>
               </Box>
               <Box>
-                My Pool LP Balance: <b>{watchdata.myPoolLPBalance}</b>
+                My Pool LP Balance: <b>{watchData.myPoolLPBalance}</b>
               </Box>
               <Box>
-                Ownership Percent: <b>{watchdata.ownershipPercent}</b>
+                Ownership Percent: <b>{watchData.ownershipPercent}</b>
               </Box>
               <Box>
-                Pool Balance: <b>{watchdata.poolBalance}</b>
+                Pool Balance: <b>{watchData.poolBalance}</b>
               </Box>
               <Box>
-                Pool SOL Balance: <b>{watchdata.poolSolBalance}</b>
+                Pool SOL Balance: <b>{watchData.poolSolBalance}</b>
               </Box>
               <Box>
-                Token SOL: <b>{watchdata.token_SOL}</b>
+                Token SOL: <b>{watchData.token_SOL}</b>
               </Box>
               <Box>
-                Token AUD: <b>{watchdata.token_AUD}</b>
+                Token AUD: <b>{watchData.token_AUD}</b>
               </Box>
               <Box>
-                SOL to AUD: <b>{watchdata.SOL_AUD}</b>
+                SOL to AUD: <b>{watchData.SOL_AUD}</b>
               </Box>
               <Box>
-                Pool SOL as AUD: <b>{watchdata.poolSOLasAUD}</b>
+                Pool SOL as AUD: <b>{watchData.poolSOLasAUD}</b>
               </Box>
               <Box>
-                Share Pool SOL as AUD: <b>{watchdata.sharePoolSolasAUD}</b>
+                Share Pool SOL as AUD: <b>{watchData.sharePoolSolasAUD}</b>
               </Box>
             </>
           )}

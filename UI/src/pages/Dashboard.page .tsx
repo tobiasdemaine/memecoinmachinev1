@@ -9,16 +9,14 @@ export const DashboardPage = () => {
   const [mainnetBalance, setMainnetBalance] = useState<any>();
 
   const getBalances = async () => {
-    setDevBalance(
-      await getBalance({
-        mode: "DEV",
-      })
-    );
-    setMainnetBalance(
-      await getBalance({
-        mode: "PROD",
-      })
-    );
+    const db = await getBalance({
+      mode: "DEV",
+    });
+    setDevBalance(db);
+    const mb = await getBalance({
+      mode: "PROD",
+    });
+    setMainnetBalance(mb);
   };
   useEffect(() => {
     getBalances();

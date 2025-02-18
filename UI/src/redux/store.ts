@@ -1,7 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { backofficeApi } from "./services/backofficeAPI";
 import { tokenSlice } from "./tokenSlice";
-// ...
 
 export const store = configureStore({
   reducer: {

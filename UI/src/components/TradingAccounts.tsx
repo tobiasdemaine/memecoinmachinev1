@@ -43,13 +43,36 @@ export const TradingAccounts = ({
     wallet: "",
   });
 
+  const saveData = (dataToSave: any) => {
+    localStorage.setItem(
+      `${token.mode}_${token.symbol}_trading_accounts`,
+      JSON.stringify(dataToSave)
+    );
+  };
+
+  const loadData = () => {
+    const savedData = localStorage.getItem(
+      `${token.mode}_${token.symbol}_trading_accounts`
+    );
+    if (savedData) {
+      return JSON.parse(savedData);
+    }
+    return [];
+  };
+
   useEffect(() => {
-    setWallets([...data]);
+    const ld = loadData();
+    if (data.length === 0) {
+      setWallets(ld);
+    } else {
+      setWallets([...data]);
+      saveData([...data]);
+    }
   }, [data]);
 
   useEffect(() => {
     if ("data" in balance) {
-      setBalance([...balance.data.data]);
+      setBalance({ ...balance.data.data });
     }
   }, [balance]);
   return (
@@ -92,12 +115,16 @@ export const TradingAccounts = ({
             }}
           />
         </Group>
-        <IconRefresh
-          onClick={() => {
-            refresh();
-          }}
-          color="rgb(25, 113, 194)"
-        />
+        {isLoading ? (
+          <Loader size={20} />
+        ) : (
+          <IconRefresh
+            onClick={() => {
+              refresh();
+            }}
+            color="rgb(25, 113, 194)"
+          />
+        )}
       </Group>
       {wallets != undefined && wallets.length === 0 ? (
         <>
@@ -125,7 +152,7 @@ export const TradingAccounts = ({
                     <Table.Td>{item.wallet}</Table.Td>
                     <Table.Td>{ilb ? <Loader size={15} /> : item.sol}</Table.Td>
                     <Table.Td>
-                      {ilb ? <Loader size={15} /> : item.tokenBalance}
+                      {ilb ? <Loader size={20} /> : item.tokenBalance}
                     </Table.Td>
                     <Table.Td>
                       <Group>
