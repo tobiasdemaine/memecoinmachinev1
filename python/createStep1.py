@@ -87,8 +87,12 @@ def createStep1():
 
     token_data["metaData"]["name"] = request.form.get('name')  
     token_data["metaData"]["symbol"] = request.form.get('symbol')
-    token_data["metaData"]["uri"] = request.form.get('url')
+    token_data["metaData"]["website"] = request.form.get('url')
     token_data["metaData"]["description"] = request.form.get('description')
+    if request.form.get('telegram'):
+        token_data["metaData"]["telegram"] = request.form.get('telegram')
+    if request.form.get('x'):
+        token_data["metaData"]["twitter"] = request.form.get('x')
 
     token_data["tokenData"]["name"] = request.form.get('name')  
     token_data["tokenData"]["decimals"] = int(request.form.get('decimals'))

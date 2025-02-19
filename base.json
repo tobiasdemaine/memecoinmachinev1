@@ -39,9 +39,9 @@
   "metaData": {
     "name": "Little",
     "symbol": "LITTLE",
-    "description": "Token of the little project to create an open source interbank payment system.",
+    "description": "Token of the little project to create an open source interbank payment system using solana.",
     "image": "image_path",
-    "uri": "https://www.littlecpaitalist.com/"
+    "website": "https://www.littlecpaitalist.com/"
   },
   "website": {
     "status": "none",

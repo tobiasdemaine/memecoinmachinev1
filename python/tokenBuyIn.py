@@ -8,6 +8,25 @@ from audit import auditAllWalletAccounts
 
 # Check for required arguments
 
+def execute_with_retry(command, wallet_address, max_retries=3, retry_delay=5):
+    for attempt in range(max_retries):
+        result = os.system(command)
+        print(result)
+        
+        if result == 0:
+            print(f"Successfully executed buy-in for wallet: {wallet_address}")
+            return  # Exit the function if successful
+        
+        # If the command failed, print the failure message
+        print(f"Attempt {attempt + 1} failed to execute buy-in for wallet: {wallet_address}")
+        
+        # If not the last attempt, wait and then retry
+        if attempt < max_retries - 1:  
+            print(f"Retrying in {retry_delay} seconds...")
+            time.sleep(retry_delay)
+        else:
+            print("Max retries reached, giving up.")
+
 
 def tokenBuyIn(json_file_path):
     with open(json_file_path, 'r') as f:
@@ -41,13 +60,8 @@ def tokenBuyIn(json_file_path):
             print(command)
             # Execute the command
             #result = subprocess.run(command, shell=True, capture_output=True, text=True)
-            result = os.system(command)
-            print(result)
-            # Check if the command was successful
-            if result != 0:
-                print(f"Failed to execute buy-in for wallet: {wallet_address}")
-            else:
-                print(f"Successfully executed buy-in for wallet: {wallet_address}")
+            execute_with_retry(command, wallet_address, 5, 2)
+            
             print("snoozing for 1 second")
             time.sleep(1)
     auditAllWalletAccounts("POST TOKEN BUY IN FROM TRADING ACCOUNTS", "", config)
