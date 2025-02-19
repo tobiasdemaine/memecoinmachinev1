@@ -1,6 +1,6 @@
 {
   "status": "begin",
-  "SOL_AMOUNT": 1,
+  "SOL_AMOUNT": 7,
   "mode": "DEV",
   "url": "https://www.littlecpaitalist.com/",
   "domain": "littlecapitalist.com",
@@ -33,7 +33,8 @@
     "tickSize": 0.01,
     "addBaseAmountNumber": 9000000,
     "addQuoteAmountNumber": 1,
-    "poolLockTime": 0
+    "poolLockTime": 0,
+    "lockpool": 0
   },
   "metaData": {
     "name": "Little",

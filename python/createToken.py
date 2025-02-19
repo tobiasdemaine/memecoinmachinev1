@@ -32,14 +32,14 @@ def createToken(json_file_path):
         auditTokenBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url d")
         run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
-        auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
+        auditBaseAccount(f"CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
     if config["mode"] == "PROD":
         auditBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url m")
         
         run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
-        auditBaseAccount("CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
-        auditTokenBaseAccount("CREATE TOKEN SOL RECEIVE", "recieve sol: {sol_amount}", config)
+        auditBaseAccount(f"CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
+    auditTokenBaseAccount(f"CREATE TOKEN SOL RECEIVE", "recieve sol: {sol_amount}", config)
 
     
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --no-passphrase")

@@ -1,3 +1,4 @@
+import json
 import subprocess
 
 
@@ -19,5 +20,6 @@ def move_token_to_wallet(json_file_path, walletfrom, addressto, amount):
         config = json.load(f)
 
     command = f"spl-token transfer {config["tokenData"]["mintAccount"]} {amount} {addressto} --owner {walletfrom}"
+    print(command)
     result = run_command(command)
     print(result)

@@ -37,7 +37,13 @@ const main = async () => {
   const WALLET_SECRET = JSON.parse(fs.readFileSync(walletPath, "utf8"));
 
   const wallet = Keypair.fromSecretKey(new Uint8Array(WALLET_SECRET));
-
+  console.log({
+    targetPool: config.tokenData.poolMintAccount,
+    inputTokenAmount,
+    outputToken,
+    slippage,
+    wallet,
+  });
   await execSwap({
     targetPool: config.tokenData.poolMintAccount,
     inputTokenAmount,

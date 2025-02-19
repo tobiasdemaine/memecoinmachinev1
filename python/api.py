@@ -1,5 +1,5 @@
 import json
-from flask import Flask, jsonify
+from flask import Flask, copy_current_request_context, jsonify
 from createBaseAccount import createBaseAccount
 from publishToken import publishToken
 from publishTokenMarket import publishTokenMarket
@@ -248,7 +248,7 @@ def tokenbalance():
 
 @app.route('/getbalance', methods=["POST"])
 def getBalance():
-    keypath = request.json.get('keypath')  
+    keypath = request.json.get('keypair')  
     data = {}
     data["sol"] = get_balance(keypath)
     data["token"]  = get_token_balance(keypath)
@@ -267,6 +267,8 @@ def switchToken():
 def audit():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
+    if not os.path.exists(filePathAudit(mode, symbol)):
+        return jsonify({"success": True, "data":[]}), 200
     with open(filePathAudit(mode, symbol), 'r') as file:
         data = json.loads(file.read())
     return jsonify({"success": True, "data": data}), 200
@@ -286,7 +288,7 @@ def getAllsolFromWallets():
     data = getAllSolfromWallets(filePath(mode, symbol))
     return jsonify({"success": True, "data": data}), 200
 
-@app.route('/tokensellout', methods=['POST'])
+@app.route('/sellalltokens', methods=['POST'])
 def tokensellOut():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
@@ -321,14 +323,18 @@ def masterwalletspend():
     data = transferSolFromMaster(address, amount, mode)
     return jsonify({"success": True, "data": data}), 200
 
-@app.route('/createStep1', methods=['POST'])
+@app.route('/newTokenStep1', methods=['POST'])
 def createstep1():
-    threading.Thread(target=createStep1, args=(request,)).start()
-    return jsonify({"success": True})
+    step = createStep1()
+    
+    return jsonify({"success": True, "data": step })
 
 @app.route('/createStep2', methods=['POST'])
 def createstep2():
-    threading.Thread(target=createStep2, args=(request,)).start()
+    @copy_current_request_context
+    def copyContextStep2():
+        createStep2(request)
+    threading.Thread(target=copyContextStep2, args=(request,)).start()
     return jsonify({"success": True})
 
 @app.route('/status', methods=['POST'])
@@ -339,9 +345,10 @@ def status():
     st["status"] = None
     if not os.path.exists(filePath(mode, symbol)):
         return jsonify({"success": True, "data": st }), 200
+    
     with open(filePath(mode, symbol), 'r') as file:
         data = json.loads(file.read())
-    return jsonify({"success": True, "data": data}), 200
+        return jsonify({"success": True, "data": data}), 200
 
 @app.route('/previewwebsite', methods=['POST'])
 def previewwebsite():
@@ -353,10 +360,11 @@ def previewwebsite():
 
 @app.route('/swapall', methods=['POST'])
 def swapAll():
+
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
-    keypath = request.json.get('keypath')
-    swapout = request.json.get('swapout')
+    keypath = request.json.get('keypair')
+    swapout = request.json.get('swapOut')
     swap_all(filePath(mode, symbol), keypath, swapout)
     #previewWebsite(filePath(mode, symbol), json)
     return jsonify({"success": True, }), 200
@@ -365,8 +373,8 @@ def swapAll():
 def swapSome():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
-    keypath = request.json.get('keypath')
-    swapout = request.json.get('swapout')
+    keypath = request.json.get('keypair')
+    swapout = request.json.get('swapOut')
     amount = request.json.get('amount')
     swap_some(filePath(mode, symbol), keypath, swapout, amount)
     return jsonify({"success": True, }), 200
@@ -381,13 +389,14 @@ def movesoltowallet():
     move_sol_to_wallet(filePath(mode, symbol), keypathfrom, keypathto, amount)
     return jsonify({"success": True, }), 200
 
-@app.route('/movetokentowallet', methods=['POST'])
+@app.route('/movetokenstowallet', methods=['POST'])
 def movetokentowallet():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
     keypathfrom = request.json.get('keypathfrom')
     keypathto = request.json.get('keypathto')
     amount = request.json.get('amount')
+    print(filePath(mode, symbol), keypathfrom, keypathto, amount)
     move_token_to_wallet(filePath(mode, symbol), keypathfrom, keypathto, amount)
     return jsonify({"success": True, }), 200
 

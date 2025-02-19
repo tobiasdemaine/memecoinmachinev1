@@ -42,10 +42,32 @@ def token_wallet_holdings(json_file_path):
     
     lines = out.splitlines()
     
-    token_balance_line = lines[2].split()[1]
-    token_balance = token_balance_line
-    print(token_balance)
-    data["tokenBalance"] = token_balance
+    raw_data = lines[2:]
+    print(raw_data)
+    objects = []
+    for line in raw_data:
+        # Convert amount to float
+        print("'"+line+"'")
+        l = line.split( )
+        if l :
+            obj = {
+                "address": l[0],
+                "amount": l[1]
+            }
+            
+            # Check if the address matches either tokenmint or poolmint
+            if l[0] == config["tokenData"]["mintAccount"]:
+                obj["type"] = "token"
+            elif l[1] == config["tokenData"]["poolMintAccount"]:
+                obj["type"] = "lp"
+            else:
+                # If the address doesn't match either, you might want to log this or handle it differently
+                obj["type"] = "lp"
+            
+            objects.append(obj)
+
+    print(objects)
+    data["tokenBalance"] = objects
         
     return data      
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Modal, NumberInput, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
@@ -9,12 +10,19 @@ export const AmountModal = ({
   buttonText,
   isLoading = false,
   maxAmount,
+  theme = {
+    w: "auto",
+    bg: "gray",
+    variant: "default",
+    c: "white",
+  },
 }: {
   text: string;
   confirm: (amount: number) => void;
   buttonText: string;
   isLoading?: boolean;
   maxAmount: number;
+  theme?: any;
 }) => {
   const [withdrawAmount, setWithdrawAmount] = useState<number | undefined>(
     undefined
@@ -27,27 +35,30 @@ export const AmountModal = ({
         loading={isLoading}
         loaderProps={{ type: "dots" }}
         onClick={() => open()}
+        variant={theme.variant}
+        bg={theme.bg}
+        w={theme.w}
+        c={theme.c}
       >
         {buttonText}
       </Button>
-      <Modal opened={opened} onClose={close} title="Withdraw from pool">
+      <Modal opened={opened} onClose={close} title="Amount">
         <Text>{text}</Text>
         <Text>Max Spendable {maxAmount}</Text>
         <NumberInput
           mt={10}
           value={withdrawAmount}
           onChange={(value) => setWithdrawAmount(Number(value))}
-          label="Withdraw Amount"
+          label="Amount"
           placeholder="Enter amount"
           mb={10}
         />
-
         {withdrawAmount !== undefined &&
           withdrawAmount > 0 &&
-          withdrawAmount <= maxAmount && (
+          withdrawAmount <= Number(maxAmount) && (
             <Confirm
               text={`Are you sure you swap ${withdrawAmount} ?`}
-              buttonText="Swap All Sol"
+              buttonText="GO "
               isLoading={isLoading}
               confirm={async () => {
                 confirm(withdrawAmount);

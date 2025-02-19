@@ -25,7 +25,7 @@ def get_balance(keypath):
             text=True,
             check=True
         )
-        return result.stdout.strip()
+        return result.stdout.strip().split()[0]
     except subprocess.CalledProcessError as e:
         print(f"Error occurred: {e.stderr}", file=sys.stderr)
         return None

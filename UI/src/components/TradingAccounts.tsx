@@ -1,5 +1,15 @@
-import { Group, Loader, Table, Text, Title } from "@mantine/core";
-import { IconRefresh } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  CopyButton,
+  Group,
+  Loader,
+  Stack,
+  Table,
+  Text,
+  Title,
+  Tooltip,
+} from "@mantine/core";
+import { IconCheck, IconCopy, IconRefresh } from "@tabler/icons-react";
 import { Confirm } from "./Confirm";
 import { notifications } from "@mantine/notifications";
 import {
@@ -15,6 +25,7 @@ import { useAppSelector } from "../redux/hooks";
 import { selectToken } from "../redux/tokenSlice";
 import { AmountModal } from "./AmountModal";
 import { useEffect, useState } from "react";
+import { MenuModal } from "./MenuModal";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 export const TradingAccounts = ({
   data,
@@ -75,6 +86,13 @@ export const TradingAccounts = ({
       setBalance({ ...balance.data.data });
     }
   }, [balance]);
+  console.log("wallets", wallets);
+
+  let cM = () => {};
+  const closeMenu = (cl: any) => {
+    cM = cl;
+  };
+
   return (
     <>
       <Title order={4} mt={20}>
@@ -116,20 +134,20 @@ export const TradingAccounts = ({
           />
         </Group>
         {isLoading ? (
-          <Loader size={20} />
+          <Loader color="grey" size={20} />
         ) : (
           <IconRefresh
             onClick={() => {
               refresh();
             }}
-            color="rgb(25, 113, 194)"
+            color="grey"
           />
         )}
       </Group>
       {wallets != undefined && wallets.length === 0 ? (
         <>
           {isLoading ? (
-            <Loader mt={10} />
+            <Loader mt={10} color="grey" />
           ) : (
             <Text mt={10}>NO TRADING ACCOUNTS</Text>
           )}
@@ -148,135 +166,221 @@ export const TradingAccounts = ({
             <Table.Tbody>
               {wallets != undefined &&
                 wallets.map((item, index) => (
-                  <Table.Tr key={item.keyPath}>
-                    <Table.Td>{item.wallet}</Table.Td>
+                  <Table.Tr key={item.walletFile}>
+                    <Table.Td>
+                      {item.wallet}
+                      <CopyButton value={item.wallet} timeout={2000}>
+                        {({ copied, copy }) => (
+                          <Tooltip
+                            label={copied ? "Copied" : "Copy"}
+                            withArrow
+                            position="right"
+                          >
+                            <ActionIcon
+                              color={copied ? "teal" : "gray"}
+                              variant="subtle"
+                              onClick={copy}
+                            >
+                              {copied ? (
+                                <IconCheck size={16} />
+                              ) : (
+                                <IconCopy size={16} />
+                              )}
+                            </ActionIcon>
+                          </Tooltip>
+                        )}
+                      </CopyButton>
+                    </Table.Td>
                     <Table.Td>{ilb ? <Loader size={15} /> : item.sol}</Table.Td>
                     <Table.Td>
                       {ilb ? <Loader size={20} /> : item.tokenBalance}
                     </Table.Td>
                     <Table.Td>
                       <Group>
-                        <Confirm
-                          text="Are you sure you swap all Sol for Tokens ?"
-                          buttonText="Swap All Sol"
-                          isLoading={isl}
-                          confirm={async () => {
-                            await swapIt({
-                              mode: token.mode,
-                              symbol: token.symbol,
-                              keypair: item.keyPair,
-                              swapOut: token.symbol,
-                            });
-                            const bal = await getBalance(item.keyPair);
-                            if ("data" in bal) {
-                              const wals = [...wallets];
-                              wals[index] = {
-                                ...wals[index],
-                                sol: bal.data.sol,
-                                tokenBalance: bal.data.token,
-                              };
-                              setWallets(wals);
-                            }
-                            notifications.show({
-                              title: "Transaction Complete",
-                              message: "The Transcation has Completed!",
-                            });
-                          }}
-                        />
-                        <Confirm
-                          text="Are you sure you swap all Tokens for Sol ?"
-                          buttonText="Swap All Tokens"
-                          isLoading={isl}
-                          confirm={async () => {
-                            await swapIt({
-                              mode: token.mode,
-                              symbol: token.symbol,
-                              keypair: item.keyPair,
-                              swapOut: "SOL",
-                            });
-                            notifications.show({
-                              title: "Transaction Complete",
-                              message: "The Transcation has Completed!",
-                            });
-                          }}
-                        />
-                        <AmountModal
-                          text="Enter the Amount of Sol to spend"
-                          buttonText="Swap Sol"
-                          isLoading={isls}
-                          confirm={async (amount: number) => {
-                            await swapItAmount({
-                              mode: token.mode,
-                              symbol: token.symbol,
-                              keypair: item.keyPair,
-                              swapOut: token.symbol,
-                              amount,
-                            });
-                            notifications.show({
-                              title: "Transaction Complete",
-                              message: "The Transcation has Completed!",
-                            });
-                          }}
-                          maxAmount={item.sol}
-                        />
-                        <AmountModal
-                          text="Enter the Amount of Token to spend"
-                          buttonText="Swap Token"
-                          isLoading={isls}
-                          confirm={async (amount: number) => {
-                            await swapItAmount({
-                              mode: token.mode,
-                              symbol: token.symbol,
-                              keypair: item.keyPair,
-                              swapOut: "SOL",
-                              amount,
-                            });
-                            notifications.show({
-                              title: "Transaction Complete",
-                              message: "The Transcation has Completed!",
-                            });
-                          }}
-                          maxAmount={item.token}
-                        />
+                        <MenuModal
+                          closeIt={(c) => closeMenu(c)}
+                          menu={
+                            <Stack gap={5}>
+                              <Confirm
+                                text="Are you sure you swap all Sol for Tokens ?"
+                                buttonText="Swap All Sol"
+                                isLoading={isl}
+                                theme={{
+                                  w: "100%",
+                                  bg: "gray",
+                                  variant: "transparent",
+                                  c: "white",
+                                }}
+                                confirm={async () => {
+                                  console.log({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypair: item.walletFile,
+                                    swapOut: token.symbol,
+                                    item,
+                                  });
+                                  await swapIt({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypair: item.walletFile,
+                                    swapOut: token.symbol,
+                                  });
+                                  const bal = await getBalance({
+                                    keypair: item.walletFile,
+                                  });
+                                  if ("data" in bal) {
+                                    const wals = [...wallets];
+                                    wals[index] = {
+                                      ...wals[index],
+                                      sol: bal.data.data.sol,
+                                      tokenBalance: bal.data.data.token,
+                                    };
+                                    setWallets(wals);
+                                  }
+                                  notifications.show({
+                                    title: "Transaction Complete",
+                                    message: "The Transcation has Completed!",
+                                  });
+                                  cM();
+                                }}
+                              />
+                              <Confirm
+                                text="Are you sure you swap all Tokens for Sol ?"
+                                buttonText="Swap All Tokens"
+                                isLoading={isl}
+                                confirm={async () => {
+                                  await swapIt({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypair: item.walletFile,
+                                    swapOut: "SOL",
+                                  });
+                                  const bal = await getBalance({
+                                    keypair: item.walletFile,
+                                  });
+                                  if ("data" in bal) {
+                                    const wals = [...wallets];
+                                    wals[index] = {
+                                      ...wals[index],
+                                      sol: bal.data.data.sol,
+                                      tokenBalance: bal.data.data.token,
+                                    };
+                                    setWallets(wals);
+                                  }
+                                  notifications.show({
+                                    title: "Transaction Complete",
+                                    message: "The Transcation has Completed!",
+                                  });
+                                }}
+                              />
+                              <AmountModal
+                                text="Enter the Amount of Sol to spend"
+                                buttonText="Swap Sol"
+                                isLoading={isls}
+                                confirm={async (amount: number) => {
+                                  await swapItAmount({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypair: item.walletFile,
+                                    swapOut: token.symbol,
+                                    amount,
+                                  });
+                                  notifications.show({
+                                    title: "Transaction Complete",
+                                    message: "The Transcation has Completed!",
+                                  });
+                                  const bal = await getBalance({
+                                    keypair: item.walletFile,
+                                  });
+                                  if ("data" in bal) {
+                                    const wals = [...wallets];
+                                    wals[index] = {
+                                      ...wals[index],
+                                      sol: bal.data.data.sol,
+                                      tokenBalance: bal.data.data.token,
+                                    };
+                                    setWallets(wals);
+                                  }
+                                  cM();
+                                }}
+                                maxAmount={item.sol}
+                              />
+                              <AmountModal
+                                text="Enter the Amount of Token to spend"
+                                buttonText="Swap Token"
+                                isLoading={isls}
+                                confirm={async (amount: number) => {
+                                  await swapItAmount({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypair: item.walletFile,
+                                    swapOut: "SOL",
+                                    amount,
+                                  });
+                                  notifications.show({
+                                    title: "Transaction Complete",
+                                    message: "The Transcation has Completed!",
+                                  });
+                                  const bal = await getBalance({
+                                    keypair: item.walletFile,
+                                  });
+                                  if ("data" in bal) {
+                                    const wals = [...wallets];
+                                    wals[index] = {
+                                      ...wals[index],
+                                      sol: bal.data.data.sol,
+                                      tokenBalance: bal.data.data.token,
+                                    };
+                                    setWallets(wals);
+                                  }
+                                  cM();
+                                }}
+                                maxAmount={item.tokenBalance}
+                              />
 
-                        <AmountModal
-                          text="Enter the Amount of SOL to Deposit into this Account"
-                          buttonText="Deposit SOL"
-                          isLoading={ilms}
-                          confirm={async (amount: number) => {
-                            await moveSol({
-                              mode: token.mode,
-                              symbol: token.symbol,
-                              keypathfrom: `tokens/keys/${token.mode}_${token.symbol}-keypair.json`,
-                              keypathto: item.keyPair,
-                              amount,
-                            });
-                            notifications.show({
-                              title: "Transaction Complete",
-                              message: "The Transcation has Completed!",
-                            });
-                          }}
-                          maxAmount={mbalance.sol}
-                        />
+                              <AmountModal
+                                text="Enter the Amount of SOL to Deposit into this Account"
+                                buttonText="Deposit SOL"
+                                isLoading={ilms}
+                                confirm={async (amount: number) => {
+                                  await moveSol({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypathfrom: `tokens/keys/${token.mode}_${token.symbol}-keypair.json`,
+                                    keypathto: item.walletFile,
+                                    amount,
+                                  });
+                                  notifications.show({
+                                    title: "Transaction Complete",
+                                    message: "The Transcation has Completed!",
+                                  });
+                                  cM();
+                                }}
+                                maxAmount={mbalance.sol}
+                              />
 
-                        <AmountModal
-                          text="Enter the Amount of Tokens to Deposit into this Account"
-                          buttonText="Deposit Tokens"
-                          isLoading={ilmt}
-                          confirm={async (amount: number) => {
-                            await moveToken({
-                              mode: token.mode,
-                              symbol: token.symbol,
-                              keypathfrom: `tokens/keys/${token.mode}_${token.symbol}-keypair.json`,
-                              keypathto: item.keyPair,
-                              amount,
-                            });
-                            notifications.show({
-                              title: "Transaction Complete",
-                              message: "The Transcation has Completed!",
-                            });
-                          }}
-                          maxAmount={mbalance.tokenBalance}
+                              <AmountModal
+                                text="Enter the Amount of Tokens to Deposit into this Account"
+                                buttonText="Deposit Tokens"
+                                isLoading={ilmt}
+                                confirm={async (amount: number) => {
+                                  await moveToken({
+                                    mode: token.mode,
+                                    symbol: token.symbol,
+                                    keypathfrom: `tokens/keys/${token.mode}_${token.symbol}-keypair.json`,
+                                    keypathto: item.walletFile,
+                                    amount,
+                                  });
+                                  notifications.show({
+                                    title: "Transaction Complete",
+                                    message: "The Transcation has Completed!",
+                                  });
+                                  cM();
+                                }}
+                                maxAmount={mbalance.tokenBalance}
+                              />
+                            </Stack>
+                          }
                         />
                       </Group>
                     </Table.Td>

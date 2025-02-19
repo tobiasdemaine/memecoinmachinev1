@@ -62,7 +62,7 @@ export const backofficeApi = createApi({
     }),
     withdrawFromAllAccounts: builder.mutation<any, any>({
       query: (body) => ({
-        url: "/etallsolfromwallets",
+        url: "/getallsolfromwallets",
         method: "POST",
         body,
       }),

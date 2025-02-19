@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button, Group, Modal, Stack } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -6,11 +7,18 @@ export const Confirm = ({
   confirm,
   buttonText,
   isLoading = false,
+  theme = {
+    w: "auto",
+    bg: "gray",
+    variant: "default",
+    c: "white",
+  },
 }: {
   text: string;
   confirm: () => void;
   buttonText: string;
   isLoading?: boolean;
+  theme?: any;
 }) => {
   const [opened, { open, close }] = useDisclosure(false);
   return (
@@ -20,6 +28,10 @@ export const Confirm = ({
         loading={isLoading}
         loaderProps={{ type: "dots" }}
         onClick={() => open()}
+        variant={theme.variant}
+        bg={theme.bg}
+        w={theme.w}
+        c={theme.c}
       >
         {buttonText}
       </Button>
@@ -37,6 +49,8 @@ export const Confirm = ({
               loading={isLoading}
               loaderProps={{ type: "dots" }}
               onClick={() => close()}
+              bg={theme.bg}
+              c={theme.c}
             >
               Cancel
             </Button>
@@ -47,6 +61,8 @@ export const Confirm = ({
                 confirm();
                 close();
               }}
+              bg={theme.bg}
+              c={theme.c}
             >
               Ok
             </Button>

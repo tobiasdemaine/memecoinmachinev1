@@ -1,14 +1,19 @@
+import threading
 from generateMetadata import generateMetaData
 from createToken import createToken
 from publishTokenMarket import publishTokenMarket
 from publishTokenPool import publishTokenPool
 from distributeSol import distributSol
 from tokenBuyIn import tokenBuyIn
+from watchPool import watch
 from tokenStart import update_json_file
+from flask import request
 import json
 from PIL import Image
 
-def update_status(file_path, token_data, status):
+def update_status(file_path,  status):
+    with open(file_path, 'r') as f:
+        token_data = json.load(f)
     token_data["status"] = status
     with open(file_path, 'w') as json_file:
         json.dump(token_data, json_file, indent=4)
@@ -18,42 +23,67 @@ def update_file(file_path, token_data):
         json.dump(token_data, json_file, indent=4)
 
 
-def createStep1(request):
+def createStep1():
+    
     required_params = [
-        'mode', 'symbol', 'description', 'name', 'initialSupply', 'decimals', 'url', 'logo',
+        'mode', 'symbol', 'description', 'name', 'initialSupply', 'decimals', 'url', 
         'RPC_MAIN', 'RPC_DEV', 'startAmount',  'tradingWalletsNumber', 'walletBaseAmount', 
-        'lotSize', 'tickSize', 'addBaseAmountNumber', 'addQuoteAmountNumber'
+        'lotSize', 'tickSize', 'addBaseAmountNumber', 'addQuoteAmountNumber', 'burnLiquidity'
     ]
-
+    required_files = ['logo']
+    
     if not request.form.get('useWebsiteBuilder') == 'false':
         additional_params = [
-            'hero', 'domain', 'ip4', 'ip6', 'ssh_user', 'ssh_password', 
+             'domain', 'ip4', 'ip6', 'ssh_user', 'ssh_password', 
         ]
         required_params.extend(additional_params)
+        additional_files = [
+             'hero', 'pdf' 
+        ]
+        required_files.extend(additional_files)
+        
+    print(request.files)
+    print(required_files)
+    files_present = all(file_name in request.files for file_name in required_files)
+   
+    
+    for key in request.form.keys():
+        print(f"Parameter: {key}, Value: {request.form[key]}")
 
+    p = False
     for param in required_params:
         if not request.form.get(param):
-            return False
+            p= True
+            print(f"required param: {param}")
+            
+    if(p):
+        exit(0)
+    
+    
         
     symbol = request.form.get('symbol')
     mode = "PROD"
     if request.form.get('mode') == 'Devnet':
         mode = "DEV"
+
         
     update_json_file(mode, request.form.get('symbol'))
     file_path = f"tokens/{mode}_{symbol}.json"
     with open(file_path, 'r') as json_file:
         token_data = json.load(json_file)
-    update_status(file_path, token_data, "saving data")
+    update_status(file_path, "saving data")
     
     token_data["mode"] = mode
-    token_data["SOL_AMOUNT"] = request.form.get('walletBaseAmount')
+    token_data["SOL_AMOUNT"] = float(request.form.get('startAmount'))
     token_data["initialSupply"] = request.form.get('initialSupply')
-    token_data["decimals"] = request.form.get('decimals')  
+    token_data["decimals"] = int(request.form.get('decimals'))  
     token_data["name"] = request.form.get('name')
     token_data["RPC_MAIN"] = request.form.get('RPC_MAIN')
     token_data["RPC_DEV"] = request.form.get('RPC_DEV')
     token_data["url"] = request.form.get('url')
+
+    token_data["wallets"]["NUM_RECIPIENTS"] =  int(request.form.get('tradingWalletsNumber'))
+    token_data["wallets"]["BASE_AMOUNT"] = float(request.form.get('walletBaseAmount'))
 
     token_data["metaData"]["name"] = request.form.get('name')  
     token_data["metaData"]["symbol"] = request.form.get('symbol')
@@ -61,22 +91,26 @@ def createStep1(request):
     token_data["metaData"]["description"] = request.form.get('description')
 
     token_data["tokenData"]["name"] = request.form.get('name')  
-    token_data["tokenData"]["decimals"] = request.form.get('decimals')
+    token_data["tokenData"]["decimals"] = int(request.form.get('decimals'))
     token_data['tokenData']["symbol"] = request.form.get('symbol')
-    token_data['tokenData']["lotSize"] = request.form.get('lotSize')
-    token_data['tokenData']["tickSize"] = request.form.get('tickSize')
-    token_data['tokenData']["addBaseAmountNumber"] = request.form.get('addBaseAmountNumber')
-    token_data['tokenData']["addQuoteAmountNumber"] = request.form.get('addQuoteAmountNumber')
+    token_data['tokenData']["lotSize"] = float(request.form.get('lotSize'))
+    token_data['tokenData']["tickSize"] = float(request.form.get('tickSize'))
+    token_data['tokenData']["addBaseAmountNumber"] = float(request.form.get('addBaseAmountNumber'))
+    token_data['tokenData']["addQuoteAmountNumber"] = float(request.form.get('addQuoteAmountNumber'))
+    token_data['tokenData']["lockpool"] = request.form.get('burnLiquidity')
 
     token_data["website"]["symbol"] = request.form.get('symbol')
-    token_data["domain"] = request.form.get('domain') | ""
-    token_data["ip4"] = request.form.get('ip4') | ""
-    token_data["ip6"] = request.form.get('ip6') | ""
-    token_data["ssh_user"] = request.form.get('ssh_user') | ""
-    token_data["ssh_password"] = request.form.get('ssh_pass') | ""
+    token_data["domain"] = request.form.get('domain') or ""
+    token_data["ip4"] = request.form.get('ip4') or ""
+    token_data["ip6"] = request.form.get('ip6') or ""
+    token_data["ssh_user"] = request.form.get('ssh_user') or ""
+    token_data["ssh_password"] = request.form.get('ssh_pass') or ""
+    if request.form.get('useWebsiteBuilder') == 'false':
+        token_data["website"]["status"] = "off"
+    else:
+        token_data["website"]["status"] = "on"
     
-    update_file(file_path, token_data)
-    update_status(file_path, token_data, "saving images")
+   
     # image
     logo = request.files.get('logo')
     if logo:
@@ -94,39 +128,53 @@ def createStep1(request):
         hero_path = f"tokens/media/{mode}_{symbol}_hero.png"
         image.save(hero_path, format='PNG')
         token_data["hero"] = hero_path
-  
-    update_status(file_path, token_data, "distributing sol to trading accounts")
-  
-    distributSol(file_path)
+    
+    pdf = request.files.get('pdf')
+    
+    if pdf:
 
-    update_status(file_path, token_data, "generating metadata")
+        pdf_path = f"tokens/media/{mode}_{symbol}_document.pdf"
+        pdf.save(pdf_path)
+        token_data["pdf"] = pdf_path
+    
+    update_file(file_path, token_data)
+    update_status(file_path,  "Setup Token Acount")
+    
+    threading.Thread(target=finishThread, args=(file_path, token_data)).start()
 
+    return token_data
+
+def finishThread(file_path, token_data):
+    
+    update_status(file_path,  "generating metadata")
     generateMetaData(file_path)
 
-    update_status(file_path, token_data, "creating token")
-  
+    update_status(file_path,  "creating token")
     createToken(file_path)
 
-    update_status(file_path, token_data, "token created")
-  
-    if not request.form.get('useWebsiteBuilder') == 'false':
-        return
+    update_status(file_path,  "distributing sol to trading accounts")
+    distributSol(file_path)
     
-    token_data["website"]["status"] = "off"
-    update_file(file_path, token_data)
     
-    update_status(file_path, token_data, "publish token market")
+    if token_data["website"]["status"] == "on":
+        exit(0)
+    
+    update_status(file_path,  "publish token market")
 
     publishTokenMarket(file_path)
 
-    update_status(file_path, token_data, "publish token pool")
+    update_status(file_path,  "publish token pool")
 
     publishTokenPool(file_path)
 
-    update_status(file_path, token_data, "token buy in")
+    update_status(file_path,  "getting pool info")
+
+    #watch(file_path)
+
+    update_status(file_path,  "token buy in")
 
     tokenBuyIn(file_path)
     
-    update_status(file_path, token_data, "complete")
+    update_status(file_path,  "complete")
 
     return 

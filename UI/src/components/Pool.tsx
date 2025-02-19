@@ -118,29 +118,30 @@ export const Pool = ({
             }}
             loading={il}
             loaderProps={{ type: "dots" }}
+            bg="gray"
           >
             Withdraw from pool
           </Button>
         )}
       </Modal>
       <Group justify="space-between" pb={5}>
-        <Button size="xs" onClick={open}>
+        <Button size="xs" onClick={open} bg="gray">
           Withdraw from Pool
         </Button>
 
         {isLoading ? (
-          <Loader size={20} />
+          <Loader color="grey" size={20} />
         ) : (
           <IconRefresh
             onClick={() => {
               refresh();
             }}
-            color="rgb(25, 113, 194)"
+            color="grey"
           />
         )}
       </Group>
       {!watchData ? (
-        <Loader />
+        <Loader color="grey" />
       ) : (
         <>
           {watchData && (

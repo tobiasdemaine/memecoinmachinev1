@@ -36,8 +36,6 @@ def getAllSolfromWallets(json_file_path):
     if not os.path.isfile(WALLETS_FILE):
         print(f"Wallet file {WALLETS_FILE} not found. Run the generate script first.")
         sys.exit(1)
-    auditTokenBaseAccount("PRE GET ALL SOL FROM TRADING ACCOUNTS", "", config)
-    auditAllWalletAccounts("PRE GET ALL SOL FROM TRADING ACCOUNTS", "", config)
     # Loop through wallets and swap all SOL for the specified token
     with open(WALLETS_FILE, 'r') as file:
         wallets = json.load(file)
@@ -45,8 +43,7 @@ def getAllSolfromWallets(json_file_path):
         for wallet_address, wallet_file in wallets.items():
             getAllSolFromWallet(wallet_file, wallet_pubkey)
             time.sleep(1)
-    auditTokenBaseAccount("POST GET ALL SOL FROM TRADING ACCOUNTS", "", config)
-    auditAllWalletAccounts("POST GET ALL SOL FROM TRADING ACCOUNTS", "", config)
+   
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

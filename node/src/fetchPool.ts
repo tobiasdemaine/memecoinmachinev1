@@ -14,7 +14,6 @@ const config = JSON.parse(fs.readFileSync(configFilePath, "utf8"));
 
 export async function ammFetchPoolId(input: TestTxInputInfo): Promise<any> {
   if (!config.poolData) {
-    console.log("This can take some time");
     const data = await formatAmmKeys(PROGRAM_ID.AmmV4.toString());
     const requirePoolData = data.filter(
       (item) => item.marketId === input.marketId

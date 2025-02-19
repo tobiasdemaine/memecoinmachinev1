@@ -29,7 +29,6 @@ def tokenBuyIn(json_file_path):
     SWAP_AMOUNT = float(config["wallets"]["BASE_AMOUNT"]) / int(config["wallets"]["NUM_RECIPIENTS"]) # The amount of SOL to swap for the token
     #cli =True
     # Loop through wallets and swap all SOL for the specified token
-    auditAllWalletAccounts("PRE TOKEN BUY IN FROM TRADING ACCOUNTS", "", config)
     with open(WALLETS_FILE, 'r') as file:
         wallets = json.load(file)
 

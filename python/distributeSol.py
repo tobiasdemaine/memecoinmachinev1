@@ -33,13 +33,16 @@ def distributSol(json_file_path):
         command = run_command(f"solana-keygen new --outfile tokens/wallets/{kname}_wallet_{i}.json --force --no-passphrase")
         wallet_address = run_command(f"solana-keygen pubkey tokens/wallets/{kname}_wallet_{i}.json")
         token_account = run_command(f"spl-token create-account --fee-payer tokens/keys/{kname}-keypair.json --owner {wallet_address} {mint_account}")
-        wsol_account = run_command(f"spl-token create-account --fee-payer tokens/keys/{kname}-keypair.json --owner {wallet_address} So11111111111111111111111111111111111111112")
+        #wsol_account = run_command(f"spl-token create-account --fee-payer tokens/keys/{kname}-keypair.json --owner {wallet_address} So11111111111111111111111111111111111111112")
         RECIPIENTS.append(wallet_address)
         wallets[f"{wallet_address}"] = f"tokens/wallets/{kname}_wallet_{i}.json"
     
         print(f"Generated wallet #{i}: {wallet_address}")
-    auditAllWalletAccounts("PRE DISTRIBUTE SOL TO TRADING ACCOUNTS", "", config)
+    
+    with open(f"tokens/wallets/{kname}_wallets.json", 'w') as f:
+        json.dump(wallets, f, indent=4)
 
+   
     # Distribute SOL to new wallets
     for recipient in RECIPIENTS:
         print(f"Sending {SOL_PER_RECIPIENT} SOL to {recipient}...")
@@ -48,8 +51,7 @@ def distributSol(json_file_path):
         print(result)
         time.sleep(1)  # Short delay to avoid rate limits
 
-    with open(f"tokens/wallets/{kname}_wallets.json", 'w') as f:
-        json.dump(wallets, f, indent=4)
+    
 
     auditAllWalletAccounts("POST DISTRIBUTE SOL TO TRADING ACCOUNTS", "", config)
     print("Wallet generation and SOL distribution complete!")

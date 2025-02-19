@@ -16,7 +16,9 @@ def swap_all(json_file_path, wallet_file, swapOut):
     with open(json_file_path, 'r') as f:
         config = json.load(f)
     address = run_command(f"solana-keygen pubkey {wallet_file}")
+    print("VVVVV", swapOut)
     if swapOut == "SOL":
+        print("----")
         out = run_command(f"spl-token accounts --owner {wallet_file}")
         lines = out.splitlines()
         
@@ -37,12 +39,13 @@ def swap_some(json_file_path, wallet_file, swapOut, amount):
     with open(json_file_path, 'r') as f:
         config = json.load(f)
     address = run_command(f"solana-keygen pubkey {wallet_file}")
+   
     if swapOut == "SOL":
-        auditWalletAccount(address, wallet_file, "PRE SWAP SOME TOKEN FOR SOL", amount, config)
+        auditWalletAccount(address, wallet_file, "PRE SWAP SOME TOKEN FOR SOL", str(amount), config)
         command = f"cd node && npx ts-node ./src/sellToken.ts ../{json_file_path} ../{wallet_file} {amount}"
-        auditWalletAccount(address, wallet_file, "POST SWAP SOME TOKEN FOR SOL", amount, config)
+        auditWalletAccount(address, wallet_file, "POST SWAP SOME TOKEN FOR SOL", str(amount), config)
     else:
-        auditWalletAccount(address, wallet_file, "PRE SWAP SOME SOL FOR TOKEN", amount, config)
+        auditWalletAccount(address, wallet_file, "PRE SWAP SOME SOL FOR TOKEN", str(amount), config)
         command = f"cd node && npx ts-node ./src/buyToken.ts ../{json_file_path} ../{wallet_file} {amount}"
-        auditWalletAccount(address, wallet_file, "POST SWAP SOME SOL FOR TOKEN", amount, config)
+        auditWalletAccount(address, wallet_file, "POST SWAP SOME SOL FOR TOKEN", str(amount), config)
     run_command(command)

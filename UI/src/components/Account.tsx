@@ -4,8 +4,16 @@ import { useAppSelector } from "../redux/hooks";
 import { useTranferSoltoMasterMutation } from "../redux/services/backofficeAPI";
 import { selectToken } from "../redux/tokenSlice";
 import { Confirm } from "./Confirm";
-import { Box, Group, Loader } from "@mantine/core";
-import { IconRefresh } from "@tabler/icons-react";
+import {
+  ActionIcon,
+  Box,
+  CopyButton,
+  Group,
+  Loader,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import { IconCheck, IconCopy, IconRefresh } from "@tabler/icons-react";
 
 export const Account = ({
   data,
@@ -45,23 +53,49 @@ export const Account = ({
           onClick={() => {
             refresh();
           }}
-          color="rgb(25, 113, 194)"
+          color="grey"
         />
       </Group>
       {isLoading ? (
-        <Loader />
+        <Loader color="grey" />
       ) : (
         <>
           {data && (
             <>
               <Box>
                 Account: <strong>{data.wallet}</strong>
+                <CopyButton value={data.wallet} timeout={2000}>
+                  {({ copied, copy }) => (
+                    <Tooltip
+                      label={copied ? "Copied" : "Copy"}
+                      withArrow
+                      position="right"
+                    >
+                      <ActionIcon
+                        color={copied ? "teal" : "gray"}
+                        variant="subtle"
+                        onClick={copy}
+                      >
+                        {copied ? (
+                          <IconCheck size={16} />
+                        ) : (
+                          <IconCopy size={16} />
+                        )}
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </CopyButton>
               </Box>
               <Box>
                 Sol: <strong>{data.sol}</strong>
               </Box>
               <Box>
-                Token: <strong>{data.tokenBalance}</strong>
+                {data.tokenBalance &&
+                  data.tokenBalance.map((tb: any) => (
+                    <Text key={tb.address}>
+                      {tb.type}: <strong>{tb.amount}</strong>
+                    </Text>
+                  ))}
               </Box>
             </>
           )}

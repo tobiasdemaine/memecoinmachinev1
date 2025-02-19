@@ -5,16 +5,20 @@ import {
   NumberInput,
   Checkbox,
   FileInput,
-  Button,
   Group,
   Select,
   SimpleGrid,
   Box,
   Title,
+  Center,
+  Card,
+  Loader,
+  Text,
 } from "@mantine/core";
 import {
   useNewTokenStep1Mutation,
   backofficeApi,
+  useStatusMutation,
 } from "../redux/services/backofficeAPI";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../redux/hooks";
@@ -42,6 +46,7 @@ interface CreateData {
   //website
   useWebsiteBuilder: boolean; // checkbox mantine
   hero: File | null; // drag and drop mantine
+  pdf: File | null; // drag and drop mantine
   domain: string;
   ip4: string;
   ip6: string;
@@ -58,6 +63,7 @@ interface CreateData {
   tickSize: number;
   addBaseAmountNumber: number;
   addQuoteAmountNumber: number;
+  burnLiquidity: boolean;
 }
 
 export const NewPage = () => {
@@ -79,27 +85,29 @@ export const NewPage = () => {
       "https://devnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
     useWebsiteBuilder: true,
     hero: null,
+    pdf: null,
     domain: "",
     ip4: "",
     ip6: "",
     ssh_user: "",
     ssh_password: "",
     startAmount: 6,
-    tradingWalletsNumber: 20,
-    walletBaseAmount: 2,
+    tradingWalletsNumber: 1,
+    walletBaseAmount: 1,
     lotSize: 1,
     tickSize: 0.0001,
-    addBaseAmountNumber: 700000,
-    addQuoteAmountNumber: 0,
+    addBaseAmountNumber: 7_000_000,
+    addQuoteAmountNumber: 0.01,
+    burnLiquidity: false,
   });
   const navigate = useNavigate();
   const [submitForm, { isLoading }] = useNewTokenStep1Mutation();
-  const [getStatus] = useNewTokenStep1Mutation();
+  const [getStatus] = useStatusMutation();
   const dispatch = useAppDispatch();
   const handleChange = (field: keyof CreateData, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
-
+  const [load, setLoad] = useState(false);
   const handleSubmit = () => {
     const requiredFields = [
       "mode",
@@ -119,11 +127,13 @@ export const NewPage = () => {
       "tickSize",
       "addBaseAmountNumber",
       "addQuoteAmountNumber",
+      // "burnLiquidity",
     ];
 
     if (formData.useWebsiteBuilder) {
       requiredFields.push(
         "hero",
+        "pdf",
         "domain",
         "ip4",
         "ip6",
@@ -131,51 +141,60 @@ export const NewPage = () => {
         "ssh_password"
       );
     }
-    const isValid = requiredFields.every(
-      (field) => formData[field as keyof CreateData]
+    const missingFields = requiredFields.filter(
+      (field) => !formData[field as keyof CreateData]
     );
-    if (!isValid) {
-      alert("Please fill all required fields");
+
+    if (missingFields.length > 0) {
+      alert(
+        `Please fill the following required fields: ${missingFields.join(
+          ", "
+        )}}`
+      );
     } else {
       // Submit form
       const formDataToSubmit = new FormData();
       Object.entries(formData).forEach(([key, value]) => {
         if (value instanceof File) {
-          formDataToSubmit.append(key, value);
+          if (value != null) formDataToSubmit.append(key, value);
         } else {
-          formDataToSubmit.append(key, value.toString());
+          if (value != null) formDataToSubmit.append(key, value.toString());
         }
       });
 
       submitForm(formDataToSubmit)
         .unwrap()
-        .then(() => {
+        .then((res) => {
+          console.log(res);
+          if (res.data == false) {
+            return;
+          }
           const getstatus = async () => {
-            notifications.show({
-              title: "Token Creation Started",
-              message: "Regeneration of Website Completed!",
-            });
             const res = await getStatus({
               symbol: formData.symbol,
-              mode: formData.mode,
+              mode: formData.mode === "Devnet" ? "DEV" : "PROD",
             });
-            if (res.data.status !== null) {
+            console.log("##", res.data);
+            if (res.data.data.status !== null) {
               dispatch(backofficeApi.util.invalidateTags(["tokens"]));
               dispatch(
                 setToken({
-                  symbol: res.data.tokenData.symbol,
-                  mode: res.data.mode,
-                  data: res.data,
+                  symbol: res.data.data.tokenData.symbol,
+                  mode: res.data.data.mode,
+                  data: res.data.data,
                 })
               );
 
-              notifications.show({
-                title: "Token creation in progress",
-                message: "Status " + res.data.status,
-              });
               navigate("/token");
+            } else {
+              setTimeout(getstatus, 500);
             }
           };
+          setLoad(true);
+          notifications.show({
+            title: "Token Creation Started",
+            message: "Please Wait!",
+          });
           setTimeout(getstatus, 500);
         })
         .catch((error) => {
@@ -187,9 +206,31 @@ export const NewPage = () => {
     }
   };
 
+  if (load) {
+    // it is
+    return (
+      <>
+        <Center>
+          <Card>
+            <Card.Section p={20}>
+              <Center p={20}>
+                <Loader size={70} />
+              </Center>
+            </Card.Section>
+            <Card.Section p={20}>
+              <Text ta="center" size="lg">
+                Token creation in progress
+              </Text>
+            </Card.Section>
+          </Card>
+        </Center>
+      </>
+    );
+  }
+
   return (
     <form>
-      <SimpleGrid cols={3}>
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }}>
         <Box>
           <Title order={3}>Token</Title>
           <Select
@@ -260,6 +301,7 @@ export const NewPage = () => {
             Website
           </Title>
           <Checkbox
+            color="gray"
             label="Use Website Builder"
             checked={formData.useWebsiteBuilder}
             onChange={(e) =>
@@ -269,6 +311,11 @@ export const NewPage = () => {
           <FileInput
             label="Hero"
             onChange={(file) => handleChange("hero", file)}
+            disabled={!formData.useWebsiteBuilder}
+          />
+          <FileInput
+            label="PDF"
+            onChange={(file) => handleChange("pdf", file)}
             disabled={!formData.useWebsiteBuilder}
           />
           <TextInput
@@ -343,13 +390,21 @@ export const NewPage = () => {
             value={formData.addQuoteAmountNumber}
             onChange={(value) => handleChange("addQuoteAmountNumber", value)}
           />
+          <Checkbox
+            color="gray"
+            mt={10}
+            label="Lock Pool"
+            checked={formData.burnLiquidity}
+            onChange={(e) =>
+              handleChange("burnLiquidity", e.currentTarget.checked)
+            }
+          />
         </Box>
       </SimpleGrid>
       <Group mt="md">
-        <Button onClick={handleSubmit}></Button>
         <Confirm
           text="Are you sure you want to create this token?"
-          buttonText="Regenerate Site"
+          buttonText="Create Token"
           isLoading={isLoading}
           confirm={async () => {
             handleSubmit();
