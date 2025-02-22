@@ -23,6 +23,9 @@ async function createMarket(input, mode) {
       tickSize: input.tickSize, // default 0.01
       dexProgramId: RAYDIUM_PROGRAM_ID.OPENBOOK_MARKET,
       makeTxVersion,
+      requestQueueSpacce: input.requestQueueSpacce,
+      eventQueueSpacce: input.eventQueueSpacce,
+      orderbookQueueSpacce: input.orderbookQueueSpacce,
     });
 
   const marketId = createMarketInstruments.address.marketId;

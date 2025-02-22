@@ -39,6 +39,9 @@ const main = async () => {
       lotSize: config.tokenData.lotSize,
       tickSize: config.tokenData.tickSize,
       wallet: myKeyPair,
+      requestQueueSpacce: config.tokenData.requestQueueSpacce,
+      eventQueueSpacce: config.tokenData.eventQueueSpacce,
+      orderbookQueueSpacce: config.tokenData.orderbookQueueSpacce,
     },
     config.mode
   );

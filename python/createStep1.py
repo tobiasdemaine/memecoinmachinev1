@@ -28,7 +28,8 @@ def createStep1():
     required_params = [
         'mode', 'symbol', 'description', 'name', 'initialSupply', 'decimals', 'url', 
         'RPC_MAIN', 'RPC_DEV', 'startAmount',  'tradingWalletsNumber', 'walletBaseAmount', 
-        'lotSize', 'tickSize', 'addBaseAmountNumber', 'addQuoteAmountNumber', 'burnLiquidity'
+        'lotSize', 'tickSize', 'addBaseAmountNumber', 'addQuoteAmountNumber', 'burnLiquidity',
+        "requestQueueSpacce", "eventQueueSpacce", "orderbookQueueSpacce",
     ]
     required_files = ['logo']
     
@@ -109,6 +110,7 @@ def createStep1():
     token_data["ip6"] = request.form.get('ip6') or ""
     token_data["ssh_user"] = request.form.get('ssh_user') or ""
     token_data["ssh_password"] = request.form.get('ssh_pass') or ""
+    
     if request.form.get('useWebsiteBuilder') == 'false':
         token_data["website"]["status"] = "off"
     else:

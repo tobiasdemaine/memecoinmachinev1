@@ -58,12 +58,15 @@ interface CreateData {
   tradingWalletsNumber: number;
   walletBaseAmount: number;
 
-  // pool details
+  // pool & market details
   lotSize: number;
   tickSize: number;
   addBaseAmountNumber: number;
   addQuoteAmountNumber: number;
   burnLiquidity: boolean;
+  requestQueueSpacce: number;
+  eventQueueSpacce: number;
+  orderbookQueueSpacce: number;
 }
 
 export const NewPage = () => {
@@ -99,6 +102,9 @@ export const NewPage = () => {
     addBaseAmountNumber: 7_000_000,
     addQuoteAmountNumber: 0.01,
     burnLiquidity: false,
+    requestQueueSpacce: 63,
+    eventQueueSpacce: 128,
+    orderbookQueueSpacce: 201,
   });
   const navigate = useNavigate();
   const [submitForm, { isLoading }] = useNewTokenStep1Mutation();
@@ -128,6 +134,9 @@ export const NewPage = () => {
       "addBaseAmountNumber",
       "addQuoteAmountNumber",
       // "burnLiquidity",
+      "requestQueueSpacce",
+      "eventQueueSpacce",
+      "orderbookQueueSpacce",
     ];
 
     if (formData.useWebsiteBuilder) {
@@ -368,7 +377,7 @@ export const NewPage = () => {
           />
 
           <Title order={3} mt={10}>
-            Pool Details
+            Pool & Market Details
           </Title>
           <NumberInput
             label="Lot Size"
@@ -380,6 +389,23 @@ export const NewPage = () => {
             value={formData.tickSize}
             onChange={(value) => handleChange("tickSize", value)}
           />
+
+          <NumberInput
+            label="Request Queue Length"
+            value={formData.requestQueueSpacce}
+            onChange={(value) => handleChange("requestQueueSpacce", value)}
+          />
+          <NumberInput
+            label="Event Queue Length"
+            value={formData.eventQueueSpacce}
+            onChange={(value) => handleChange("eventQueueSpacce", value)}
+          />
+          <NumberInput
+            label="Orderbook Length"
+            value={formData.orderbookQueueSpacce}
+            onChange={(value) => handleChange("orderbookQueueSpacce", value)}
+          />
+
           <NumberInput
             label="Amount of Tokens at start of pool"
             value={formData.addBaseAmountNumber}

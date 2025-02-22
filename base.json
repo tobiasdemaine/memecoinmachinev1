@@ -34,7 +34,10 @@
     "addBaseAmountNumber": 9000000,
     "addQuoteAmountNumber": 1,
     "poolLockTime": 0,
-    "lockpool": 0
+    "lockpool": 0,
+    "requestQueueSpacce": 63,
+    "eventQueueSpacce": 128,
+    "orderbookQueueSpacce": 201
   },
   "metaData": {
     "name": "Little",
