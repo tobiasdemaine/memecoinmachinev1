@@ -58,8 +58,8 @@ def token_wallet_holdings(json_file_path):
             # Check if the address matches either tokenmint or poolmint
             if l[0] == config["tokenData"]["mintAccount"]:
                 obj["type"] = "token"
-            elif l[1] == config["tokenData"]["poolMintAccount"]:
-                obj["type"] = "lp"
+            #elif l[1] == config["pool"]["lpMint"]:
+            #    obj["type"] = "lp"
             else:
                 # If the address doesn't match either, you might want to log this or handle it differently
                 obj["type"] = "lp"

@@ -22,7 +22,7 @@ import {
 } from "../redux/services/backofficeAPI";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../redux/hooks";
-import { setToken } from "../redux/tokenSlice";
+import { setRefetch, setToken } from "../redux/tokenSlice";
 import { notifications } from "@mantine/notifications";
 import { Confirm } from "../components/Confirm";
 
@@ -76,8 +76,8 @@ export const NewPage = () => {
     symbol: "",
     description: "",
     name: "",
-    initialSupply: 10_000_000,
-    decimals: 9,
+    initialSupply: 100_000_000,
+    decimals: 8,
     url: "",
     logo: null,
     telgram: "",
@@ -86,7 +86,7 @@ export const NewPage = () => {
       "https://mainnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
     RPC_DEV:
       "https://devnet.helius-rpc.com/?api-key=858e2c68-23eb-489d-84c2-fb86acd26c7f",
-    useWebsiteBuilder: true,
+    useWebsiteBuilder: false,
     hero: null,
     pdf: null,
     domain: "",
@@ -94,17 +94,17 @@ export const NewPage = () => {
     ip6: "",
     ssh_user: "",
     ssh_password: "",
-    startAmount: 6,
+    startAmount: 5,
     tradingWalletsNumber: 1,
     walletBaseAmount: 1,
     lotSize: 1,
     tickSize: 0.0001,
-    addBaseAmountNumber: 7_000_000,
-    addQuoteAmountNumber: 0.01,
+    addBaseAmountNumber: 50_000_000,
+    addQuoteAmountNumber: 1,
     burnLiquidity: false,
-    requestQueueSpacce: 63,
-    eventQueueSpacce: 128,
-    orderbookQueueSpacce: 201,
+    requestQueueSpacce: 764,
+    eventQueueSpacce: 11308,
+    orderbookQueueSpacce: 14524,
   });
   const navigate = useNavigate();
   const [submitForm, { isLoading }] = useNewTokenStep1Mutation();
@@ -183,9 +183,10 @@ export const NewPage = () => {
               symbol: formData.symbol,
               mode: formData.mode === "Devnet" ? "DEV" : "PROD",
             });
-            console.log("##", res.data);
+            console.log("#", res.data);
             if (res.data.data.status !== null) {
               dispatch(backofficeApi.util.invalidateTags(["tokens"]));
+
               dispatch(
                 setToken({
                   symbol: res.data.data.tokenData.symbol,
@@ -193,7 +194,7 @@ export const NewPage = () => {
                   data: res.data.data,
                 })
               );
-
+              dispatch(setRefetch(true));
               navigate("/token");
             } else {
               setTimeout(getstatus, 500);
@@ -388,6 +389,27 @@ export const NewPage = () => {
             label="Tick Size"
             value={formData.tickSize}
             onChange={(value) => handleChange("tickSize", value)}
+          />
+          <Select
+            label="Select Market Type"
+            data={["0.4 SOL", "1.5 SOL", "2.8 SOL"]}
+            onChange={(value) => {
+              if (value === "0.4 SOL") {
+                handleChange("requestQueueSpacce", 764);
+                handleChange("eventQueueSpacce", 11308);
+                handleChange("orderbookQueueSpacce", 14524);
+              }
+              if (value === "1.5 SOL") {
+                handleChange("requestQueueSpacce", 5084);
+                handleChange("eventQueueSpacce", 123244);
+                handleChange("orderbookQueueSpacce", 32452);
+              }
+              if (value === "2.8 SOL") {
+                handleChange("requestQueueSpacce", 5084);
+                handleChange("eventQueueSpacce", 262108);
+                handleChange("orderbookQueueSpacce", 65500);
+              }
+            }}
           />
 
           <NumberInput

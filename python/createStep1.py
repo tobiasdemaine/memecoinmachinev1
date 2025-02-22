@@ -5,6 +5,7 @@ from publishTokenMarket import publishTokenMarket
 from publishTokenPool import publishTokenPool
 from distributeSol import distributSol
 from tokenBuyIn import tokenBuyIn
+from burnLiquidity import burnLiquidity
 from watchPool import watch
 from tokenStart import update_json_file
 from flask import request
@@ -103,6 +104,9 @@ def createStep1():
     token_data['tokenData']["addBaseAmountNumber"] = float(request.form.get('addBaseAmountNumber'))
     token_data['tokenData']["addQuoteAmountNumber"] = float(request.form.get('addQuoteAmountNumber'))
     token_data['tokenData']["lockpool"] = request.form.get('burnLiquidity')
+    token_data['tokenData']["requestQueueSpacce"] = int(request.form.get('requestQueueSpacce'))
+    token_data['tokenData']["eventQueueSpacce"] = int(request.form.get('eventQueueSpacce'))
+    token_data['tokenData']["orderbookQueueSpacce"] = int(request.form.get('orderbookQueueSpacce'))
 
     token_data["website"]["symbol"] = request.form.get('symbol')
     token_data["domain"] = request.form.get('domain') or ""
@@ -175,7 +179,9 @@ def finishThread(file_path, token_data):
 
     update_status(file_path,  "getting pool info")
 
-    #watch(file_path)
+    if token_data['tokenData']["lockpool"] != "false":
+        update_status(file_path,  "burning liquidity")
+        burnLiquidity(file_path)
 
     update_status(file_path,  "token buy in")
 

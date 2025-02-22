@@ -23,7 +23,6 @@ export const TokenPage = () => {
         mode: token.data.mode,
         symbol: token.data.metaData.symbol,
       });
-      console.log(res.data);
       dispatch(
         setToken({
           symbol: res.data.data.metaData.symbol,

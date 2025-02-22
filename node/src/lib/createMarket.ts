@@ -28,6 +28,19 @@ async function createMarket(input, mode) {
       orderbookQueueSpacce: input.orderbookQueueSpacce,
     });
 
+  console.log({
+    connection,
+    wallet: input.wallet.publicKey,
+    baseInfo: input.baseToken,
+    quoteInfo: input.quoteToken,
+    lotSize: input.lotSize, // default 1
+    tickSize: input.tickSize, // default 0.01
+    dexProgramId: RAYDIUM_PROGRAM_ID.OPENBOOK_MARKET,
+    makeTxVersion,
+    requestQueueSpacce: input.requestQueueSpacce,
+    eventQueueSpacce: input.eventQueueSpacce,
+    orderbookQueueSpacce: input.orderbookQueueSpacce,
+  });
   const marketId = createMarketInstruments.address.marketId;
 
   const txids = await buildAndSendTx(

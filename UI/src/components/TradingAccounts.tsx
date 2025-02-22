@@ -79,7 +79,11 @@ export const TradingAccounts = ({
       setWallets([...data]);
       saveData([...data]);
     }
-  }, [data]);
+  }, [data, token]);
+
+  useEffect(() => {
+    console.log(token);
+  }, [token]);
 
   useEffect(() => {
     if ("data" in balance) {

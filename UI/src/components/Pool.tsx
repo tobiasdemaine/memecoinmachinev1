@@ -68,16 +68,21 @@ export const Pool = ({
   };
   useEffect(() => {
     const ld = loadData();
+    console.log(ld, watchdata);
     if (ld && !watchdata) {
       setWatchData({ ...ld });
     }
+    if (!ld && !watchdata) {
+      setWatchData({});
+    }
+
     if (watchdata) {
       if (Object.keys(watchdata).length > 0) {
         setWatchData({ ...watchdata });
         saveData({ ...watchdata });
       }
     }
-  }, [watchdata]);
+  }, [watchdata, token]);
   //console.log(watchdata, watchData);
   return (
     <>

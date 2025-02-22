@@ -98,7 +98,7 @@ async function createPool(params, mode) {
   console.log("Pool Create Tranasactions :", txids);
   console.log("Pool Address :", poolId);
 
-  return poolId;
+  return initPoolInstructionResponse.address;
 }
 
 function calcMarketStartPrice(input) {

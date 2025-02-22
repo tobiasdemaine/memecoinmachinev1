@@ -47,12 +47,11 @@ export const Token = () => {
       mode: token.data.mode,
       symbol: token.data.metaData.symbol,
     });
-  }, []);
+  }, [token.symbol]);
 
   const watchdata = result?.data?.data || null;
   const auditData = auditResult?.data?.data || [];
   const balanceData = balanceResult?.data?.data || null;
-  console.log(tradingAccountsResult);
   const tradingAccountsData = tradingAccountsResult?.data?.data || [];
 
   return (

@@ -6,6 +6,7 @@ from distributeSol import distributSol
 from tokenBuyIn import tokenBuyIn
 from publishWebsite import publishWebsite
 from regenerateSite import regenerateSite
+from burnLiquidity import burnLiquidity
 from tokenStart import update_json_file
 import json
 from PIL import Image
@@ -53,6 +54,10 @@ def createStep2(file_path, json_data):
     update_status(file_path,  "publish token pool")
 
     publishTokenPool(file_path)
+
+    if token_data['tokenData']["lockpool"] != "false":
+        update_status(file_path,  "burning liquidity")
+        burnLiquidity(file_path)
 
     update_status(file_path,  "token buy in")
 

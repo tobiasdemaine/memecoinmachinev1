@@ -10,6 +10,7 @@ const initialState = {
   mode: "DEV",
   symbol: "",
   data: {} as any,
+  refetch: false,
 };
 
 export const tokenSlice = createSlice({
@@ -23,10 +24,13 @@ export const tokenSlice = createSlice({
       state.symbol = action.payload.symbol;
       state.data = action.payload.data;
     },
+    setRefetch: (state, action: PayloadAction<any>) => {
+      state.refetch = action.payload;
+    },
   },
 });
 
-export const { setToken } = tokenSlice.actions;
+export const { setToken, setRefetch } = tokenSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectToken = (state: RootState) => state.token;

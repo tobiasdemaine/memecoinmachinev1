@@ -12,7 +12,6 @@ const main = async () => {
   if (!configPath) {
     throw new Error("Config file path must be provided as the first argument");
   }
-
   const config = JSON.parse(fs.readFileSync(configPath, "utf8"));
 
   if (config.tokenData.targetMarketId === "") {
@@ -23,7 +22,6 @@ const main = async () => {
     console.log("Pool Mint Account is already set. Exiting...");
     return;
   }
-
   const baseToken = new Token(
     TOKEN_PROGRAM_ID,
     new PublicKey(config.tokenData.mintAccount),
@@ -31,14 +29,12 @@ const main = async () => {
     config.tokenData.symbol,
     config.tokenData.tokenName
   );
-
   const addBaseAmount = new BN(
     config.tokenData.addBaseAmountNumber * 10 ** config.tokenData.decimals
   ); // custom token
   const addQuoteAmount = new BN(
     config.tokenData.addQuoteAmountNumber * 10 ** 9
   ); // WSOL
-
   const startTime =
     Math.floor(Date.now() / 1000) + config.tokenData.poolLockTime * 60 * 60;
 
@@ -67,7 +63,7 @@ const main = async () => {
 
   console.log("Creating Pool...");
 
-  const targetPoolPubkey = await createPool(
+  const targetPool = await createPool(
     {
       baseToken,
       quoteToken: DEFAULT_TOKEN.WSOL,
@@ -80,9 +76,8 @@ const main = async () => {
     config.mode
   );
 
-  const targetPool = targetPoolPubkey.toString();
-  console.log(targetPool);
-  config.tokenData.poolMintAccount = targetPool;
+  config.tokenData.poolMintAccount = targetPool.ammId.toString();
+  config.pool = targetPool;
 
   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
   console.log("Config file updated with targetPool.");

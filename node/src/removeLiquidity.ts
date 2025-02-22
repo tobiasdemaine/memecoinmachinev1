@@ -45,7 +45,7 @@ async function withdrawFromPool(
   const lpToken = new Token(
     TOKEN_PROGRAM_ID,
     new PublicKey(config.poolData.lpMint),
-    9,
+    config.poolData.lpDecimals,
     config.tokenData.symbol + "-SOL",
     config.tokenData.symbol + "-SOL"
   );

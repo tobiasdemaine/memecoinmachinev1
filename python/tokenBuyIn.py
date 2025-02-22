@@ -60,7 +60,7 @@ def tokenBuyIn(json_file_path):
             print(command)
             # Execute the command
             #result = subprocess.run(command, shell=True, capture_output=True, text=True)
-            execute_with_retry(command, wallet_address, 5, 2)
+            execute_with_retry(command, wallet_address, 20, 3)
             
             print("snoozing for 1 second")
             time.sleep(1)

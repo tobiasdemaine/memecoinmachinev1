@@ -7,20 +7,24 @@ import {
 import { useEffect } from "react";
 import { IconCoin } from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../redux/hooks";
-import { setToken } from "../redux/tokenSlice";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import { selectToken, setRefetch, setToken } from "../redux/tokenSlice";
 
 export const Tokens = () => {
   const { data, isLoading, refetch } = useTokensQuery();
   const [updatePost] = useSwitchTokenMutation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const token = useAppSelector(selectToken);
   const tokens = data?.data ?? [];
   useEffect(() => {
-    refetch();
-  }, []);
+    if (token.refetch) {
+      refetch();
+      dispatch(setRefetch(false));
+    }
+  }, [token]);
 
-  console.log(tokens, isLoading);
+  console.log("TOKENS is LOADING", isLoading);
   return (
     <>
       <Text fz="xs">Mainnet</Text>

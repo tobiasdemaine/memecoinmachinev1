@@ -24,7 +24,7 @@ def publishTokenPool(json_file):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python publishToken.py <json_file>")
+        print("Usage: python publishPool.py <json_file>")
         sys.exit(1)
 
     json_file = sys.argv[1]
