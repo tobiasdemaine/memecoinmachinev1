@@ -1,4 +1,4 @@
-import { AppShell, Group, NavLink, Burger, Box } from "@mantine/core";
+import { AppShell, Group, NavLink, Burger, Box, Anchor } from "@mantine/core";
 import { useNavigate } from "react-router-dom";
 import {
   IconCoin,
@@ -45,6 +45,15 @@ export const Shell = () => {
               ? "Withdraw"
               : `${token.mode} ${token.symbol}`}
           </Box>
+
+          {window.location.pathname === "/token" && (
+            <Anchor
+              target="_blank"
+              href={`https://dexscreener.com/solana/${token.data.tokenData.poolMintAccount}`}
+            >
+              DexScreener
+            </Anchor>
+          )}
         </Group>
       </AppShell.Header>
       <AppShell.Navbar p="md">
