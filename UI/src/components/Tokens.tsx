@@ -58,13 +58,14 @@ export const Tokens = () => {
           .filter((token: any) => token.mode === "DEV")
           .map((token: any) => (
             <NavLink
-              key={token.url}
+              key={token.tokenData.symbol}
               leftSection={<IconCoin size="1rem" stroke={1.5} />}
               onClick={async () => {
                 await updatePost({
                   mode: token.mode,
                   symbol: token.metaData.symbol,
                 });
+
                 dispatch(
                   setToken({
                     mode: token.mode,
@@ -72,6 +73,7 @@ export const Tokens = () => {
                     data: token,
                   })
                 );
+
                 navigate("/token");
               }}
               label={token.metaData?.symbol}

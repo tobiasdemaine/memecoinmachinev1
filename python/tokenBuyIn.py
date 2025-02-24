@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
 
 from audit import auditAllWalletAccounts
@@ -48,6 +49,7 @@ def tokenBuyIn(json_file_path):
     SWAP_AMOUNT = float(config["wallets"]["BASE_AMOUNT"]) / int(config["wallets"]["NUM_RECIPIENTS"]) # The amount of SOL to swap for the token
     #cli =True
     # Loop through wallets and swap all SOL for the specified token
+    threads = []
     with open(WALLETS_FILE, 'r') as file:
         wallets = json.load(file)
 
@@ -60,10 +62,22 @@ def tokenBuyIn(json_file_path):
             print(command)
             # Execute the command
             #result = subprocess.run(command, shell=True, capture_output=True, text=True)
-            execute_with_retry(command, wallet_address, 20, 3)
+            #execute_with_retry(command, wallet_address, 20, 3)
             
-            print("snoozing for 1 second")
-            time.sleep(1)
+            thread = threading.Thread(
+            target=execute_with_retry,
+            args=(command, wallet_address, 20, 1)
+            )
+            threads.append(thread)
+            thread.start()
+        
+          # Start the thread
+    
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
+            
+            
     auditAllWalletAccounts("POST TOKEN BUY IN FROM TRADING ACCOUNTS", "", config)
     print("Token buy-in process complete!")
 

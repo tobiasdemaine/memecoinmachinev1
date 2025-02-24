@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import sys
+import threading
 import time
 
 from audit import auditAllWalletAccounts
@@ -14,6 +15,8 @@ def run_command(command):
         exit(1)
     return result.stdout.strip()
 
+def runComand(command):
+    result = os.system(command)
 
 # Check for required arguments
 def tokenSellOut(json_file_path):
@@ -32,11 +35,12 @@ def tokenSellOut(json_file_path):
     network = "mainnet"
     if(config["mode"] == "DEV"):
         network = "devnet"
-    auditAllWalletAccounts("PRE TOKEN SELL OUT FROM TRADING ACCOUNTS", "", config)
+    #auditAllWalletAccounts("PRE TOKEN SELL OUT FROM TRADING ACCOUNTS", "", config)
     # Loop through wallets and swap all SOL for the specified token
+    threads = []
     with open(WALLETS_FILE, 'r') as file:
         wallets = json.load(file)
-
+        balances = []
         for wallet_address, wallet_file in wallets.items():
             print(f"Wallet Holdings: {wallet_address} ({wallet_file})")
             # Load the wallet keypair
@@ -47,13 +51,28 @@ def tokenSellOut(json_file_path):
             token_balance_line = lines[2].split()[1]
             token_balance = token_balance_line
             print(f"{config["metaData"]["symbol"]} Balance: {token_balance}")
+            balance = {}
+            balance["token_balance"] = token_balance
+            balance["wallet_file"] = wallet_file
+            balances.append(balance)
+
+        for balance in balances:    
+            command = f"cd node && npx ts-node ./src/sellToken.ts ../{json_file_path} ../{balance["wallet_file"]} {balance["token_balance"]}"
+            thread = threading.Thread(
+            target=runComand,
+            args=(command,)
+            )
+            threads.append(thread)
+            thread.start()
         
-            command = f"cd node && npx ts-node ./src/sellToken.ts ../{json_file_path} ../{wallet_file} {token_balance}"
-            result = os.system(command)
-            print(result)
-            
-            print("-")
-    auditAllWalletAccounts("PRE TOKEN SELL OUT FROM TRADING ACCOUNTS", "", config)
+          # Start the thread
+    
+    # Wait for all threads to complete
+    for thread in threads:
+        thread.join()
+
+
+    auditAllWalletAccounts("POST TOKEN SELL OUT FROM TRADING ACCOUNTS", "", config)
 
 if __name__ == "__main__":          
     if len(sys.argv) < 2:

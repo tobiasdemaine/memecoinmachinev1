@@ -381,7 +381,14 @@ export const TradingAccounts = ({
                                   });
                                   cM();
                                 }}
-                                maxAmount={mbalance.tokenBalance}
+                                maxAmount={
+                                  mbalance.tokenBalance &&
+                                  Array.isArray(mbalance.tokenBalance)
+                                    ? mbalance.tokenBalance.filter(
+                                        (t: any) => t.type === "token"
+                                      )[0].amount
+                                    : 100000000000
+                                }
                               />
                             </Stack>
                           }
