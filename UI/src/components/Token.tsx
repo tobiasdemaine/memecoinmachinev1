@@ -1,9 +1,7 @@
 import { useEffect } from "react";
 import { useAppSelector } from "../redux/hooks";
 import {
-  useAuditMutation,
   useTokenWalletBalanceMutation,
-  useTradingAccountsMutation,
   useWatchMutation,
 } from "../redux/services/backofficeAPI";
 import { selectToken } from "../redux/tokenSlice";
@@ -15,31 +13,19 @@ import {
   IconUsers,
   IconWebhook,
 } from "@tabler/icons-react";
-import { Audit } from "./Audit";
 import { Website } from "./Website";
 import { Account } from "./Account";
-import { TradingAccounts } from "./TradingAccounts";
 import { Data } from "./Data";
 import { Pool } from "./Pool";
+import { TradingAccountsV2 } from "./TradingAccountsv2";
 
 export const Token = () => {
   const token = useAppSelector(selectToken);
   const [getWatch, result] = useWatchMutation();
-  const [getAudit, auditResult] = useAuditMutation();
   const [getBalance, balanceResult] = useTokenWalletBalanceMutation();
-  const [getTradingAccounts, tradingAccountsResult] =
-    useTradingAccountsMutation();
 
   useEffect(() => {
     getWatch({
-      mode: token.data.mode,
-      symbol: token.data.metaData.symbol,
-    });
-    getAudit({
-      mode: token.data.mode,
-      symbol: token.data.metaData.symbol,
-    });
-    getTradingAccounts({
       mode: token.data.mode,
       symbol: token.data.metaData.symbol,
     });
@@ -50,9 +36,7 @@ export const Token = () => {
   }, [token.symbol]);
 
   const watchdata = result?.data?.data || null;
-  const auditData = auditResult?.data?.data || [];
   const balanceData = balanceResult?.data?.data || null;
-  const tradingAccountsData = tradingAccountsResult?.data?.data || [];
 
   return (
     <>
@@ -74,13 +58,9 @@ export const Token = () => {
             Data
           </Tabs.Tab>
           <Tabs.Tab value="Audit" leftSection={<IconCoin size={12} />}>
-            Audit
+            Transactions
           </Tabs.Tab>
         </Tabs.List>
-
-        <Tabs.Panel value="Audit">
-          <Audit data={auditData} />
-        </Tabs.Panel>
 
         <Tabs.Panel value="Website">
           <Website />
@@ -97,7 +77,7 @@ export const Token = () => {
             }}
             isLoading={balanceResult.isLoading}
           />
-          <TradingAccounts
+          {/* <TradingAccounts
             data={tradingAccountsData}
             isLoading={tradingAccountsResult.isLoading}
             refresh={() => {
@@ -107,7 +87,8 @@ export const Token = () => {
               });
             }}
             balance={balanceResult}
-          />
+          /> */}
+          <TradingAccountsV2 balance={balanceResult} />
         </Tabs.Panel>
 
         <Tabs.Panel value="Data">

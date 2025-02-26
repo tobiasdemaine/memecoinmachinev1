@@ -11,7 +11,7 @@ import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { selectToken, setRefetch, setToken } from "../redux/tokenSlice";
 
 export const Tokens = () => {
-  const { data, isLoading, refetch } = useTokensQuery();
+  const { data, refetch } = useTokensQuery();
   const [updatePost] = useSwitchTokenMutation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -24,7 +24,6 @@ export const Tokens = () => {
     }
   }, [token]);
 
-  console.log("TOKENS is LOADING", isLoading);
   return (
     <>
       <Text fz="xs">Mainnet</Text>

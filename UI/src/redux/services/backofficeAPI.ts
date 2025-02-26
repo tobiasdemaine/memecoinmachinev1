@@ -52,6 +52,13 @@ export const backofficeApi = createApi({
         body,
       }),
     }),
+    TradingAccountsV2: builder.mutation<any, any>({
+      query: (body) => ({
+        url: "/tradingaccounts",
+        method: "POST",
+        body,
+      }),
+    }),
 
     withdrawLiquidity: builder.mutation<any, any>({
       query: (body) => ({
@@ -174,7 +181,7 @@ export const backofficeApi = createApi({
     }),
     moveSolToWallet: builder.mutation<any, any>({
       query: (body) => ({
-        url: "/movetokenstowallet",
+        url: "/movesoltowallet",
         method: "POST",
         body,
       }),
@@ -209,4 +216,5 @@ export const {
   useGetBalanceMutation,
   useMoveSolToWalletMutation,
   useMoveTokensToWalletMutation,
+  useTradingAccountsV2Mutation,
 } = backofficeApi;

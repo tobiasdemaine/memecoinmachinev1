@@ -27,7 +27,6 @@ export const Account = ({
   const token = useAppSelector(selectToken);
   const [moveFunds, { isLoading: il }] = useTranferSoltoMasterMutation();
 
-  console.log(data);
   return (
     <>
       <Group mt={10} mb={10} justify="space-between">
@@ -44,7 +43,7 @@ export const Account = ({
               refresh();
               notifications.show({
                 title: "Transaction Complete",
-                message: "The Transcation has Completed!",
+                message: "The Transaction has Completed!",
               });
             }}
           />

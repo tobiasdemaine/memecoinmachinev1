@@ -115,7 +115,7 @@ export const TradingAccounts = ({
               });
               notifications.show({
                 title: "Transaction Complete",
-                message: "The Transcation has Completed!",
+                message: "The Transaction has Completed!",
               });
               refresh();
             }}
@@ -131,7 +131,7 @@ export const TradingAccounts = ({
               });
               notifications.show({
                 title: "Transaction Complete",
-                message: "The Transcation has Completed!",
+                message: "The Transaction has Completed!",
               });
               refresh();
             }}
@@ -197,7 +197,7 @@ export const TradingAccounts = ({
                     </Table.Td>
                     <Table.Td>{ilb ? <Loader size={15} /> : item.sol}</Table.Td>
                     <Table.Td>
-                      {ilb ? <Loader size={20} /> : item.tokenBalance}
+                      {ilb ? <Loader size={15} /> : item.tokenBalance}
                     </Table.Td>
                     <Table.Td>
                       <Group>
@@ -243,7 +243,7 @@ export const TradingAccounts = ({
                                   }
                                   notifications.show({
                                     title: "Transaction Complete",
-                                    message: "The Transcation has Completed!",
+                                    message: "The Transaction has Completed!",
                                   });
                                   cM();
                                 }}
@@ -273,8 +273,9 @@ export const TradingAccounts = ({
                                   }
                                   notifications.show({
                                     title: "Transaction Complete",
-                                    message: "The Transcation has Completed!",
+                                    message: "The Transaction has Completed!",
                                   });
+                                  cM();
                                 }}
                               />
                               <AmountModal
@@ -291,7 +292,7 @@ export const TradingAccounts = ({
                                   });
                                   notifications.show({
                                     title: "Transaction Complete",
-                                    message: "The Transcation has Completed!",
+                                    message: "The Transaction has Completed!",
                                   });
                                   const bal = await getBalance({
                                     keypair: item.walletFile,
@@ -323,7 +324,7 @@ export const TradingAccounts = ({
                                   });
                                   notifications.show({
                                     title: "Transaction Complete",
-                                    message: "The Transcation has Completed!",
+                                    message: "The Transaction has Completed!",
                                   });
                                   const bal = await getBalance({
                                     keypair: item.walletFile,
@@ -349,16 +350,28 @@ export const TradingAccounts = ({
                                 confirm={async (amount: number) => {
                                   await moveSol({
                                     mode: token.mode,
-                                    symbol: token.symbol,
+                                    symbol: "SOL",
                                     keypathfrom: `tokens/keys/${token.mode}_${token.symbol}-keypair.json`,
                                     keypathto: item.walletFile,
                                     amount,
                                   });
                                   notifications.show({
                                     title: "Transaction Complete",
-                                    message: "The Transcation has Completed!",
+                                    message: "The Transaction has Completed!",
                                   });
                                   cM();
+                                  const bal = await getBalance({
+                                    keypair: item.walletFile,
+                                  });
+                                  if ("data" in bal) {
+                                    const wals = [...wallets];
+                                    wals[index] = {
+                                      ...wals[index],
+                                      sol: bal.data.data.sol,
+                                      tokenBalance: bal.data.data.token,
+                                    };
+                                    setWallets(wals);
+                                  }
                                 }}
                                 maxAmount={mbalance.sol}
                               />
@@ -377,8 +390,20 @@ export const TradingAccounts = ({
                                   });
                                   notifications.show({
                                     title: "Transaction Complete",
-                                    message: "The Transcation has Completed!",
+                                    message: "The Transaction has Completed!",
                                   });
+                                  const bal = await getBalance({
+                                    keypair: item.walletFile,
+                                  });
+                                  if ("data" in bal) {
+                                    const wals = [...wallets];
+                                    wals[index] = {
+                                      ...wals[index],
+                                      sol: bal.data.data.sol,
+                                      tokenBalance: bal.data.data.token,
+                                    };
+                                    setWallets(wals);
+                                  }
                                   cM();
                                 }}
                                 maxAmount={

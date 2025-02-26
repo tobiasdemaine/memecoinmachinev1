@@ -7,6 +7,7 @@ from tokenBuyIn import tokenBuyIn
 from publishWebsite import publishWebsite
 from regenerateSite import regenerateSite
 from burnLiquidity import burnLiquidity
+from publishTokenMarketV2 import publishTokenMarketV2
 from tokenStart import update_json_file
 import json
 from PIL import Image
@@ -49,7 +50,7 @@ def createStep2(file_path, json_data):
 
     update_status(file_path,  "publish token market")
 
-    publishTokenMarket(file_path)
+    publishTokenMarketV2(file_path)
 
     update_status(file_path,  "publish token pool")
 

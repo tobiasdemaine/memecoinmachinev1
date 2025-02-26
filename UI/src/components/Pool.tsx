@@ -68,7 +68,6 @@ export const Pool = ({
   };
   useEffect(() => {
     const ld = loadData();
-    console.log(ld, watchdata);
     if (ld && !watchdata) {
       setWatchData({ ...ld });
     }
@@ -117,7 +116,7 @@ export const Pool = ({
               close();
               notifications.show({
                 title: "Transaction Complete",
-                message: "The Transcation has Completed!",
+                message: "The Transaction has Completed!",
               });
               refresh();
             }}

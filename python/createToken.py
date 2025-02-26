@@ -2,7 +2,7 @@ import subprocess
 import json
 import sys
 
-from audit import auditBaseAccount, auditTokenBaseAccount
+#from #audit import #auditBaseAccount, #auditTokenBaseAccount
 
 def run_command(command):
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
@@ -29,17 +29,17 @@ def createToken(json_file_path):
     print(f"Token mint authority: {mint_authority}")
 
     if config["mode"] == "DEV":
-        auditTokenBaseAccount("CREATE TOKEN START", "", config)
+        #auditTokenBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url d")
         run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
-        auditBaseAccount(f"CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
+        #auditBaseAccount(f"CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
     if config["mode"] == "PROD":
-        auditBaseAccount("CREATE TOKEN START", "", config)
+        ##auditBaseAccount("CREATE TOKEN START", "", config)
         run_command(f"solana config set --url m")
         
         run_command(f"solana transfer {mint_authority} {sol_amount} --keypair ./tokens/keys/base-keypair.json --allow-unfunded-recipient")
-        auditBaseAccount(f"CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
-    auditTokenBaseAccount(f"CREATE TOKEN SOL RECEIVE", "recieve sol: {sol_amount}", config)
+        #auditBaseAccount(f"CREATE TOKEN SOL TRANSFER", "transfer sol: {sol_amount}", config)
+    #auditTokenBaseAccount(f"CREATE TOKEN SOL RECEIVE", "recieve sol: {sol_amount}", config)
 
     
     run_command(f"solana-keygen new --outfile tokens/keys/{kname}-mintaccount-keypair.json --force --no-passphrase")
@@ -67,7 +67,7 @@ def createToken(json_file_path):
     initial_supply = config['initialSupply']
     print(f"Minting {initial_supply} tokens to token account...")
     run_command(f"spl-token mint {mint_account} {initial_supply} {token_account}")
-    auditTokenBaseAccount("CREATE TOKEN RECEIVE MINT", "recieve MINT: {token_account}", config)
+    #auditTokenBaseAccount("CREATE TOKEN RECEIVE MINT", "recieve MINT: {token_account}", config)
    
     metadata = {
         "name": config['metaData']['name'],

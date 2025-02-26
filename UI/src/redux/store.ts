@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { backofficeApi } from "./services/backofficeAPI";
 import { tokenSlice } from "./tokenSlice";
+import { accountSlice } from "./accountsSlice";
 
 export const store = configureStore({
   reducer: {
     //posts: postsReducer,
     //comments: commentsReducer,
     token: tokenSlice.reducer,
+    account: accountSlice.reducer,
     [backofficeApi.reducerPath]: backofficeApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>

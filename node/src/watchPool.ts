@@ -8,7 +8,6 @@ import BN from "bn.js";
 
 import { connection } from "./config";
 
-import { ammFetchPoolId } from "./fetchPool";
 import axios from "axios";
 
 // --- CONFIGURATION ---
@@ -26,15 +25,17 @@ const POOL_WALLET_SECRET = JSON.parse(
 const poolWallet = Keypair.fromSecretKey(new Uint8Array(POOL_WALLET_SECRET));
 
 async function getPool() {
-  const marketId = config.tokenData.targetMarketId;
+  /*const marketId = config.tokenData.targetMarketId;
   const pool = await ammFetchPoolId({
     marketId,
-  });
-  const account = await connection.getAccountInfo(new PublicKey(pool.id));
+  });*/
+  const account = await connection.getAccountInfo(
+    new PublicKey(config.pool.ammId)
+  );
   if (account === null) throw Error(" get id info error ");
   const info = LIQUIDITY_STATE_LAYOUT_V4.decode(account.data);
 
-  return { pool: info, poolId: new PublicKey(pool.id) };
+  return { pool: info, poolId: new PublicKey(config.pool.ammId) };
 }
 
 // --- FETCH TOTAL POOL BALANCE ---

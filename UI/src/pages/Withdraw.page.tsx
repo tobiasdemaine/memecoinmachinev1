@@ -102,7 +102,7 @@ export const WithdrawPage = () => {
                 getBalances();
                 notifications.show({
                   title: "Transaction Complete",
-                  message: "The Transcation has Completed!",
+                  message: "The Transaction has Completed!",
                 });
               }
             }}

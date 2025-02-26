@@ -52,7 +52,7 @@ def wallet_holdings(json_file_path):
             
             token_balance_line = lines[2].split()[1]
             token_balance = token_balance_line
-            print(token_balance)
+            print(lines)
             data["tokenBalance"] = token_balance
             walletS.append(data)
 

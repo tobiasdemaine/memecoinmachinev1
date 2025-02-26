@@ -15,6 +15,7 @@
     "@mantine/modals": "^7.16.3",
     "@mantine/notifications": "^7.16.3",
     "@reduxjs/toolkit": "^2.5.1",
+    "@solana/react": "^2.0.0",
     "@tabler/icons-react": "^3.30.0",
     "json-edit-react": "^1.22.6",
     "react": "^19.0.0",

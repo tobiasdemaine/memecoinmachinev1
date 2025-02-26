@@ -20,9 +20,9 @@ def switch_token(json_file_path):
         return result.stdout.strip()
 
     if config["mode"] == "DEV":
-        run_command(f"solana config set --url devnet --keypair tokens/keys/{kname}-keypair.json")
+        run_command(f"solana config set --url d --keypair tokens/keys/{kname}-keypair.json")
     if config["mode"] == "PROD":
-        run_command(f"solana config set --url mainnet --keypair tokens/keys/{kname}-keypair.json")
+        run_command(f"solana config set --url m --keypair tokens/keys/{kname}-keypair.json")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:

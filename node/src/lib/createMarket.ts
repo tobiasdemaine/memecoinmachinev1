@@ -28,43 +28,19 @@ async function createMarket(input, mode) {
       orderbookQueueSpacce: input.orderbookQueueSpacce,
     });
 
-  console.log({
-    connection,
-    wallet: input.wallet.publicKey,
-    baseInfo: input.baseToken,
-    quoteInfo: input.quoteToken,
-    lotSize: input.lotSize, // default 1
-    tickSize: input.tickSize, // default 0.01
-    dexProgramId: RAYDIUM_PROGRAM_ID.OPENBOOK_MARKET,
-    makeTxVersion,
-    requestQueueSpacce: input.requestQueueSpacce,
-    eventQueueSpacce: input.eventQueueSpacce,
-    orderbookQueueSpacce: input.orderbookQueueSpacce,
-  });
+  console.log(input);
   const marketId = createMarketInstruments.address.marketId;
 
   const txids = await buildAndSendTx(
     createMarketInstruments.innerTransactions,
-    { skipPreflight: true }
+    { skipPreflight: false }
   );
   console.log("Market Created");
   console.log("Create Market Transactions :", txids);
   console.log("Market Address :", marketId);
 
-  return marketId;
+  /*return marketId;*/
+  return "";
 }
-
-//async function howToUse() {
-// const baseToken = DEFAULT_TOKEN.LITS // RAY
-// const quoteToken = DEFAULT_TOKEN.WSOL // USDC
-// createMarket({
-//     baseToken,
-//     quoteToken,
-//     wallet: wallet,
-// }).then(({ txids }) => {
-//     /** continue with txids */
-//     console.log('txids', txids)
-// })
-//}
 
 export { createMarket };

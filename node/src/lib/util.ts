@@ -33,8 +33,21 @@ async function sendTx(connection, payer, txs, options) {
   for (const iTx of txs) {
     if (iTx instanceof VersionedTransaction) {
       iTx.sign([payer]);
+      /* const simulationResult = await connection.simulateTransaction(iTx);
+      console.log(
+        "Simulation Result:",
+        JSON.stringify(simulationResult, null, 2)
+        //  iTx
+      );
+      */
       txids.push(await connection.sendTransaction(iTx, options));
     } else {
+      /*const simulationResult = await connection.simulateTransaction(iTx);
+      console.log(
+        "Simulation Result:",
+        JSON.stringify(simulationResult, null, 2)
+      );
+      */
       txids.push(await connection.sendTransaction(iTx, [payer], options));
     }
   }

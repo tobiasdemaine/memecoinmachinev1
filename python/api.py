@@ -201,13 +201,14 @@ def listkeypairs():
 def tradingAccounts():
     symbol = request.json.get('symbol')
     mode = request.json.get('mode')
-    wallets = []
+    accounts = []
     with open(f'tokens/wallets/{mode}_{symbol}_wallets.json', 'r') as file:
         wallets = json.load(file)
 
         for wallet_address, wallet_file in wallets.items():
-            wallets
-    return jsonify({"success": True, "data": wallets}), 200
+            accounts.append(wallet_address)
+
+    return jsonify({"success": True, "data": accounts}), 200
 
 @app.route('/listwallets', methods=['GET'])
 def listwallets():

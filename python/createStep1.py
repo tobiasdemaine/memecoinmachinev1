@@ -6,6 +6,7 @@ from publishTokenPool import publishTokenPool
 from distributeSol import distributSol
 from tokenBuyIn import tokenBuyIn
 from burnLiquidity import burnLiquidity
+from  publishTokenMarketV2 import publishTokenMarketV2
 from watchPool import watch
 from tokenStart import update_json_file
 from flask import request
@@ -165,13 +166,12 @@ def finishThread(file_path, token_data):
     update_status(file_path,  "distributing sol to trading accounts")
     distributSol(file_path)
     
-    
     if token_data["website"]["status"] == "on":
         exit(0)
     
     update_status(file_path,  "publish token market")
 
-    publishTokenMarket(file_path)
+    publishTokenMarketV2(file_path)
 
     update_status(file_path,  "publish token pool")
 
