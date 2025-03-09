@@ -1,8 +1,17 @@
-## Install
+# MEME COIN MACHINE v1
+
+This is a fun exploration into Solana meme coins. Launch a coin, create a Openbook market and Raydium liquidity pool then snipe and trade the coin with as many accounts as wish.
+
+## Install and run
 
 '''
 ./install.sh
+
+./run.sh
+
 '''
+
+Open http://127.0.0.1:5000/ in your browser
 
 ## Python ENV
 
@@ -16,21 +25,7 @@ source .venv/bin/activate
 This account is where all profit sol is paid into
 '''
 python3 python/createBaseAccount.py
-
-# STAGED
-
-staged is grouped steps
-
-mode: DEV|PROD
-symbol: SYMBOL
-
-scripts/1_start.sh <mode> <symbol>
-
-scripts/2_publish.sh <mode> <symbol>
-
-scripts/3_create.sh <mode> <symbol>
-
-scripts/4_watch.sh <mode> <symbol>
+'''
 
 # MANUAL
 
