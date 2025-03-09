@@ -12,10 +12,20 @@ interface Account {
   token: number;
   secret?: string | null;
 }
-// Define the initial state using that type
-const initialState: { accounts: Account[] } = {
-  accounts: [],
+
+const loadFromLocalStorage = (): { accounts: Account[] } => {
+  try {
+    const stored = localStorage.getItem("accountState");
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error("Failed to load from localStorage:", e);
+  }
+  return { accounts: [] };
 };
+// Define the initial state using that type
+const initialState: { accounts: Account[] } = loadFromLocalStorage();
 
 export const accountSlice = createSlice({
   name: "account",
@@ -27,9 +37,10 @@ export const accountSlice = createSlice({
       const idx = state.accounts.findIndex(
         (account) => account.account == action.payload.address
       );
-      if (idx) {
+      if (idx > -1) {
         state.accounts[idx] = action.payload;
       } else {
+        console.log(action.payload);
         state.accounts.push(action.payload);
       }
     },

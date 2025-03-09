@@ -10,29 +10,37 @@ export const TokenLoading = () => {
   const [getStatus] = useStatusMutation();
   useEffect(() => {
     const getStatusF = async () => {
-      const res = await getStatus({
-        mode: token.data.mode,
-        symbol: token.data.metaData.symbol,
-      });
-
-      dispatch(
-        setToken({
-          symbol: res.data.data.metaData.symbol,
-          mode: res.data.data.mode,
-          data: res.data.data,
-        })
-      );
+      console.log(token.data.status);
       if (
         token.data.status === "complete" ||
-        (token.data.status === "token created" && token.data.website === "none")
+        (token.data.status === "token created" && token.data.website === "on")
       ) {
         console.log("cooked");
       } else {
-        setTimeout(getStatusF, 2000);
+        const res = await getStatus({
+          mode: token.data.mode,
+          symbol: token.data.metaData.symbol,
+        });
+        if (res.data.data.status !== token.data.status) {
+          dispatch(
+            setToken({
+              symbol: res.data.data.metaData.symbol,
+              mode: res.data.data.mode,
+              data: res.data.data,
+            })
+          );
+        }
+        console.log(token.data);
       }
     };
-    getStatusF();
-  }, []);
+    const interval = setInterval(() => {
+      getStatusF();
+    }, 5000);
+
+    //Clearing the interval
+    return () => clearInterval(interval);
+    //
+  }, [token]);
 
   return (
     <>

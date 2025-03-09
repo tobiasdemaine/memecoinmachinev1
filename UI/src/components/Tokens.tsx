@@ -46,7 +46,7 @@ export const Tokens = () => {
                     data: token,
                   })
                 );
-                navigate("/token");
+                navigate(`/token/${token.mode}_${token.symbol}`);
               }}
               label={token.metaData?.symbol}
             />
@@ -73,7 +73,7 @@ export const Tokens = () => {
                   })
                 );
 
-                navigate("/token");
+                navigate(`/token/${token.mode}_${token.metaData.symbol}`);
               }}
               label={token.metaData?.symbol}
             />

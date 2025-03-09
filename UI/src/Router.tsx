@@ -10,7 +10,7 @@ export function Router() {
       <Route path="/" element={<DashboardPage />} />
       <Route path="/new" element={<NewPage />} />
       <Route path="/withdraw" element={<WithdrawPage />} />
-      <Route path="/Token" element={<TokenPage />} />
+      <Route path="/token/:id" element={<TokenPage />} />
     </Routes>
   );
 }

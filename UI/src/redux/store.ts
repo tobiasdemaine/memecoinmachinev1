@@ -15,6 +15,16 @@ export const store = configureStore({
     getDefaultMiddleware().concat(backofficeApi.middleware),
 });
 
+// Sync state to localStorage on every change
+store.subscribe(() => {
+  try {
+    const state = store.getState().account;
+    localStorage.setItem("accountState", JSON.stringify(state));
+  } catch (e) {
+    console.error("Failed to save to localStorage:", e);
+  }
+});
+
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
 

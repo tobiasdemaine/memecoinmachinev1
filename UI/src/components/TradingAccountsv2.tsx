@@ -92,6 +92,7 @@ export const TradingAccountsV2 = ({ balance }: { balance: any }) => {
               const acc = accounts.accounts.find(
                 (account) => account.account == address
               );
+              console.log(accounts.accounts);
 
               let tokenBalance = 0;
               let tokenAccPK;
@@ -115,7 +116,13 @@ export const TradingAccountsV2 = ({ balance }: { balance: any }) => {
                     tokenAccPK = tokenAccounts.value[0].pubkey;
                     tokenBalance = accountInfo.value.uiAmount as number;
                   }
-
+                  console.log({
+                    account: address,
+                    tokenMint: tokenMint.toBase58(),
+                    tokenAccount: tokenAccPK && tokenAccPK.toBase58(),
+                    sol: solBalance,
+                    token: tokenBalance,
+                  });
                   dispatch(
                     setAccount({
                       account: address,
