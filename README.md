@@ -1,6 +1,6 @@
 # MEME COIN MACHINE v1
 
-This is a fun exploration into Solana meme coins. Launch coins, create a Openbook markets and Raydium liquidity pools then snipe and trade the coins with as many accounts as wish.
+This is a fun exploration into Solana meme coins. Launch coins, create Openbook markets and Raydium liquidity pools then snipe and trade the coins with as many accounts as wish.
 
 ## Install and run
 ```
